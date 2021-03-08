@@ -1,0 +1,310 @@
+
+<button data-id="' . $saleDetail->id . '" class="btn btn-primary btn-sm btn-increase-quantity"></button>
+public function getForm(Request $request){
+        $sale_id = $request->sale_id;
+        $sale = Sale::find($sale_id);
+        // $sale = Sale::where('table_id', $table_id)->get();
+        // $sale = $request->table_id;
+        // dd($sale);
+        $html = '';
+        // $html .= "$sale_id";
+        $html .=
+        '<div class="card" style="margin-top: 2.5rem;">
+            <div class="card-header">
+                <h3>Total: Rp ' . number_format($sale->total_price) . '</h3>
+            </div>
+            <div class="card-body">
+                <div class="panel">
+                    <div class="row">
+                        <table class="table table-striped">
+                            <tr>
+                                <td>
+                                    <label for="">Customer Name</label>
+                                    <input type="text" name="customer_name" id="" class="form-control">
+                                </td>
+                                <td>
+                                    <label for="">Customer Phone</label>
+                                    <input type="number" name="customer_phone" id="" class="form-control">
+                                </td>
+                            </tr>
+                        </table>
+                        <td>Payment Method <br>
+                        <div class="">
+                            <span class="radio-item">
+                                <input type="radio" name="payment_method" id="payment_method" class="true" value="cash" checked="checked">
+                                <label for="payment_method"> <i class="fa fa-money-bill text-success"></i> Cash</label>
+                            </span>
+
+                            <span class="radio-item">
+                                <input type="radio" name="payment_method" id="payment_method" class="true" value="bank transfer">
+                                <label for="payment_method"> <i class="fa fa-university text-danger"></i> Bank Transfer</label>
+                            </span>
+
+                            <span class="radio-item">
+                                <input type="radio" name="payment_method" id="payment_method" class="true" value="credit Card">
+                                <label for="payment_method"> <i class="fa fa-credit-card text-info"></i> Credit Card</label>
+                            </span>
+                        </div>
+                        </td><br>
+                        <td>
+                            Payment
+                            <input type="number" name="paid_amout" id="paid_amount" class="form-control">
+                        </td>
+                        <td>
+                            Returning Change
+                            <input type="number" readonly name="balance" id="balance" class="form-control">
+                        </td>
+                        <td>
+                            <button class="btn btn-lg btn-primary btn-block mt-4">Save</button>
+                        </td>
+                    </div>
+                </div>
+            </div>
+        </div>';
+
+        // $html .= $this->getSaleDetails($sale_id);
+        return $html;
+    }
+
+    $('#table').append(`
+            <thead>
+                <tr class="text-lite text-center">
+                    <th scope="col">Table</th>
+                    <th scope="col">Menu</th>
+                </tr>
+            </thead>
+            <tbody>
+                    @foreach($saleDetail as $saleDetail)
+                    <tr>
+                        <td>{{$sales->table_name}}</td>
+                        <td>{{$saleDetail->menu_name}}</td>
+                    </tr>
+                    @endforeach
+            </tbody>
+        `);
+
+
+        <div class="container row">
+    @php
+        $lama = $saleDetails->first()->sale_id-1;
+    @endphp
+        <div class="card ml-4" style="width: 18rem; background-color: rgb(50, 212, 72)">
+            <h1 class="text-center">{{$saleDetails->first()->sale->table_name}}</h1>
+            <div class="card-body">
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{$saleDetails->first()->menu_name}} {{$saleDetails->first()->quantity}}</li>
+                        <div class="btn btn-primary">Fast Food</div>
+                    </ul>
+                </div>
+            </div>
+    @foreach ($saleDetails as $index=>$saleDetail)
+        @if($saleDetails->first()->sale_id != $saleDetail->sale_id)
+        @if($saleDetail->sale_id != $lama)
+            </div>
+        @endif
+        @if($saleDetail->sale_id != $lama)
+            <div class="card ml-4" style="width: 18rem; background-color: rgb(50, 212, 72)">
+                <h1 class="text-center">{{$saleDetail->sale->table_name}}</h1>
+        @endif
+                <div class="card-body">
+                    <div class="card">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">{{$saleDetail->menu_name}}</li>
+                            <div class="btn btn-primary">Fast Food</div>
+                        </ul>
+                    </div>
+                </div>
+        @if($saleDetail->sale_id != $lama)
+            @php
+                $lama = $saleDetail->sale_id;
+            @endphp
+        @endif
+        {{-- @if ($lama == 0)
+            <h1>anjib</h1>
+        @endif --}}
+        @endif
+    @endforeach
+    </div>
+</div>
+
+
+background
+<div class="container row">
+    @if($saleDetails->first() != null)
+    @php
+        $lama = $saleDetails->first()->sale_id-1;
+    @endphp
+        <div class="card ml-4" style="width: 18rem; background-color: rgb(50, 212, 72)">
+            <h1 class="text-center">{{$saleDetails->first()->sale->table_name}}</h1>
+            {{-- <div class="card-body">
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{$saleDetails->first()->menu_name}}</li>
+                        <div class="btn btn-primary">Fast Food</div>
+                    </ul>
+                </div>
+            </div> --}}
+    @foreach ($saleDetails as $index=>$saleDetail)
+        @if($saleDetails->first()->sale_id != $saleDetail->sale_id)
+        @if($saleDetail->sale_id != $lama)
+            </div>
+        @endif
+        @if($saleDetail->sale_id != $lama)
+            <div class="card ml-3" style="width: 18rem; background-color: rgb(50, 212, 72)">
+                <h1 class="text-center">{{$saleDetail->sale->table_name}}</h1>
+        @endif
+                <div class="card-body">
+                    <div class="card">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">{{$saleDetail->menu_name}} {{$saleDetail->quantity}}</li>
+                            <div class="btn btn-primary">Fast Food</div>
+                        </ul>
+                    </div>
+                </div>
+        @if($saleDetail->sale_id != $lama)
+            @php
+                $lama = $saleDetail->sale_id;
+            @endphp
+        @endif
+        @endif
+        @if($saleDetails->first()->sale_id == $saleDetail->sale_id)
+        <div class="card-body">
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{$saleDetail->menu_name}} {{$saleDetail->quantity}}</li>
+                    <div class="btn btn-primary">Fast Food</div>
+                </ul>
+            </div>
+        </div>
+        @endif
+    @endforeach
+    </div>
+    @endif
+</div>
+
+<div class="container">
+    <div class="row">
+    @if($saleDetails->first() != null)
+    @php
+        $lama = $saleDetails->first()->sale_id-1;
+    @endphp
+        <div class="card ml-3" style="width: 18rem; background-color: rgb(50, 212, 72)">
+            <h1 class="text-center">{{$saleDetails->first()->sale->table_name}}</h1>
+            {{-- <div class="card-body">
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">{{$saleDetails->first()->menu_name}}</li>
+                        <div class="btn btn-primary">Fast Food</div>
+                    </ul>
+                </div>
+            </div> --}}
+    @foreach ($saleDetails as $index=>$saleDetail)
+        @if($saleDetails->first()->sale_id != $saleDetail->sale_id)
+        @if($saleDetail->sale_id != $lama)
+            </div>
+        @endif
+        @if($saleDetail->sale_id != $lama)
+            <div class="card ml-3" style="width: 18rem; background-color: rgb(50, 212, 72)">
+                <h1 class="text-center">{{$saleDetail->sale->table_name}}</h1>
+        @endif
+                    <div class="card ml-3 mr-3">
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">{{$saleDetail->menu_name}} {{$saleDetail->quantity}}</li>
+                            <div class="btn btn-primary">Fast Food</div>
+                        </ul>
+                    </div>
+        @if($saleDetail->sale_id != $lama)
+            @php
+                $lama = $saleDetail->sale_id;
+            @endphp
+        @endif
+        @endif
+        @if($saleDetails->first()->sale_id == $saleDetail->sale_id)
+            <div class="card ml-3 mr-3">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">{{$saleDetail->menu_name}} {{$saleDetail->quantity}}</li>
+                    <div class="btn btn-primary">Fast Food</div>
+                </ul>
+            </div>
+        @endif
+    @endforeach
+    </div>
+    @endif
+</div>
+</div>
+
+
+<div id="wrapper">
+        <div class="receipt-header">
+            <h3 id="restaurant-name">{{ __("The Professor's Caffe") }}</h3>
+        </div>
+        <div class="receipt text-center" style="text-align: center;">
+            <p>JL. KH Ahmad Dalan No. 18, Kebayoran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta, 121 30</p>
+            <p>081381517194</p>
+            {{-- <p>Invoice: <strong>{{$sale->id}}</strong></p> --}}
+        </div>
+        <div class="receipt-body">
+            <table class="table-sale-detail">
+                <thead>
+                    <tr>
+                        <th>Menu</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Diskon</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($saleDetails as $saleDetail)
+                        <tr>
+                            <td width="160">{{$saleDetail->menu_name}}</td>
+                            <td width="50">{{$saleDetail->quantity}}</td>
+                            <td width="60">{{number_format($saleDetail->menu_price * $saleDetail->quantity, 0, ',', '.' )}}</td>
+                            <td width="60">{{$saleDetail->menu_discount}} %</td>
+                            <td width="65">{{number_format(($saleDetail->menu_price * $saleDetail->quantity) - ($saleDetail->menu_price * $saleDetail->quantity * ($saleDetail->menu_discount / 100)), 0, ',', '.' )}}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            <table class="table-sale-total">
+                <tbody>
+                    <tr>
+                        <td>VAT</td>
+                        @foreach ($ppn as $ppn)
+                            <td>{{$ppn->ppn}}%</td>
+                        @endforeach
+                        <td>Total</td>
+                        <td>Rp{{number_format($sale->total_price + $sale->total_price * $ppn->ppn / 100, 0, ',', '.' )}}</td>
+                        {{-- <td width="60">{{$saleDetail->menu_discount}}</td> --}}
+                    </tr>
+                    <tr>
+                        <td colspan="2">Tipe Pembayaran</td>
+                        <td colspan="2">{{$sale->payment_type}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Jumlah Pembayaran</td>
+                        <td colspan="2">Rp{{number_format($sale->total_received, 0, ',', '.')}}</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Total Kembali</td>
+                        <td colspan="2">Rp{{number_format($sale->change, 0, ',', '.')}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="receipt-footer">
+            <p>Thank You!!</p>
+        </div>
+        <div class="buttons">
+            <a href="/cashier/index">
+                <button class="btn btn-back">
+                    Back To Cashier
+                </button>
+            </a>
+            {{-- <button class="btn btn-print" type="button" onclick="window.print(); return false;">
+                Print
+            </button> --}}
+            <a href="my.bluetoothprint.scheme://http://10.96.48.97:8000/cashier/showReceipt/245">Print</a>
+        </div>
+    </div>
