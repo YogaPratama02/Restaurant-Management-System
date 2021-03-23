@@ -120,11 +120,8 @@ class MenuController extends Controller
                 ]);
             })
             ->addColumn('image', function ($menus) {
-                if ($menus->image == 'noimage.png') {
-                    return 'noimage.png';
-                }
                 $url = asset('menu_images/' . $menus->image);
-                $image = '<img src="' . $url . '" width="100" height="100"/>';
+                $image = '<img src="' . $url . '" width="110px" height="110px"/>';
                 return $image;
             })
             ->editColumn('price', function ($menus) {

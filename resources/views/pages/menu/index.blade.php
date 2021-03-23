@@ -1,10 +1,9 @@
 @extends('layouts.default')
 
 @section('content')
-
     <div class="container">
-        <div class="row justify-content-center col-md-12">
-            <div class="">
+        <div class="row justify-content-center">
+            <div class="col-md-12">
                 <div class="card mt-3">
                     <div class="card-header" style="background-color:#295192">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-hamburger"></i> Menu

@@ -18,4 +18,9 @@ class Sale extends Model
     {
         return $this->belongsTo('App\User');
     }
+
+    public function roles()
+    {
+        return $this->belongsTo(Role::class);
+    }
 }

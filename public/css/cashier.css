@@ -1,0 +1,23 @@
+/* @media only screen and (max-width: 600px) {
+    query {
+      height:1vh;
+      width: 1vw;
+      background-color: black;
+    }
+  } */
+
+/* .catnam{
+    font-size: x-large;
+} */
+
+/* $html .= '
+                    <div class="">
+                        <button class="btn btn-outline-secondary btn-menu" data-id="' . $menu->id . '">
+                            <img class="img-fluid justify-content-between" style="width:110px; height:90px;" src="' . url('/menu_images/' . $menu->image) . '"/>
+                            <br>
+                            ' . $menu->name . '
+                            <br>
+                            Rp' . number_format($menu->price, 3) . '
+                        </button>
+                    </div>
+                    '; */

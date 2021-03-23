@@ -13,9 +13,9 @@ class AddRoleToUsers extends Migration
      */
     public function up()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('admin')->after('name');
-        });
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->string('role')->default('admin')->after('name');
+        // });
     }
 
     /**
@@ -25,8 +25,8 @@ class AddRoleToUsers extends Migration
      */
     public function down()
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        // Schema::table('users', function (Blueprint $table) {
+        //     $table->dropColumn('role');
+        // });
     }
 }

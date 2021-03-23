@@ -21,9 +21,9 @@ Route::get('/', 'HomeController@show');
 Auth::routes(['register' => true, 'reset' => false]);
 
 // Route::get('/home', 'HomeController@index')->name('dashboard');
-Route::middleware(['auth'])->group(function () {
+Route::group(['middleware' => ['role:cashier|super admin|admin']], function () {
     // Cashier
-    Route::get('/cashier/index', 'CashierController@index')->name('cashier.index');
+    Route::get('/cashier', 'CashierController@index')->name('cashier.index');
     Route::get('/cashier/getTable', 'CashierController@getTables');
     Route::get('/cashier/getMenu/{category_id}', 'CashierController@getMenu');
     Route::post('/cashier/order', 'CashierController@getOrder');
@@ -32,37 +32,20 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cashier/confirmAgain', 'CashierController@confirmAgain');
     // Route::post('/cashier/increase-quantity', 'CashierController@increaseQuantity');
     Route::post('/cashier/decrease-quantity', 'CashierController@decreaseQuantity');
+    Route::get('/cashier/note/{id}', 'CashierController@notes')->name('cashier.note');
+    Route::post('/cashier/update', 'CashierController@requestNotes')->name('cashier.update');
     Route::post('/cashier/savePayment', 'CashierController@savePayment');
     Route::get('/cashier/showReceipt/{saleID}', 'CashierController@showReceipt');
     Route::get('/cashier/jsonReceipt/{saleID}', 'CashierController@jsonReceipt');
-});
 
-Route::middleware(['auth', 'VerifyAdmin'])->group(function () {
-    Route::get('/management', function () {
-        return view('pages.management.index');
-    });
-
-    Route::resource('category', 'CategoryController');
-    Route::get('/management/category', 'CategoryController@index');
-    Route::get('/management/create', 'CategoryController@dataTable')->name('pages.management.category');
-
-    // User
-    Route::get('/management/user', 'UserController@index');
-    Route::get('/management/user/show', 'UserController@DataTable')->name('user.coba');
-    Route::get('/management/user/create', 'UserController@create')->name('user.create');
-    Route::post('/management/user/store', 'UserController@store')->name('user.store');
-    Route::get('/management/user/edit/{id}', 'UserController@edit')->name('user.edit');
-    Route::put('/management/user/update/{id}', 'UserController@update')->name('user.update');
-    Route::delete('/management/user/destroy/{id}', 'UserController@destroy')->name('user.destroy');
-
-    // Menu
-    Route::get('/management/menu', 'MenuController@index')->name('pages.menu.index');
-    Route::get('/table/menu', 'MenuController@dataTable')->name('table.menu');
-    Route::get('/menu/create', 'MenuController@create')->name('menu.create');
-    Route::post('/menu/store', 'MenuController@store')->name('menu.store');
-    Route::get('/edit/{id}', 'MenuController@edit')->name('menu.edit');
-    Route::put('update/{id}', 'MenuController@update')->name('menu.update');
-    Route::delete('delete/{id}', 'MenuController@destroy')->name('menu.destroy');
+    //roombooking
+    Route::get('/bookingroom', 'RoomBookingController@index')->name('roombooking.index');
+    Route::get('/bookingroom/data', 'RoomBookingController@dataTable')->name('roombooking.data');
+    Route::get('/bookingroom/create', 'RoomBookingController@create')->name('roombooking.create');
+    Route::post('/bookingroom/store', 'RoomBookingController@store')->name('roombooking.store');
+    Route::get('/bookingroom/edit/{id}', 'RoomBookingController@edit')->name('roombooking.edit');
+    Route::put('/bookingroom/update/{id}', 'RoomBookingController@update')->name('roombooking.update');
+    Route::delete('/bookingroom/delete/{id}', 'RoomBookingController@destroy')->name('roombooking.destroy');
 
     // kitchen
     Route::get('/kitchen', 'KitchenController@index')->name('kitchen.index');
@@ -78,43 +61,42 @@ Route::middleware(['auth', 'VerifyAdmin'])->group(function () {
         $saledetail->status = 'finish';
         $saledetail->save();
     });
+});
+
+Route::group(['middleware' => ['role:super admin|admin']], function () {
+    Route::get('/management', function () {
+        return view('pages.management.index');
+    });
+    Route::resource('category', 'CategoryController');
+    Route::get('/category', 'CategoryController@index')->name('category.index');
+    Route::get('/management/create', 'CategoryController@dataTable')->name('pages.management.category');
+
+    // User
+    Route::get('/user', 'UserController@index')->name('user.index');
+    Route::get('/management/user/show', 'UserController@DataTable')->name('user.coba');
+    Route::get('/management/user/create', 'UserController@create')->name('user.create');
+    Route::post('/management/user/store', 'UserController@store')->name('user.store');
+    Route::get('/management/user/edit/{id}', 'UserController@edit')->name('user.edit');
+    Route::put('/management/user/update/{id}', 'UserController@update')->name('user.update');
+    Route::delete('/management/user/destroy/{id}', 'UserController@destroy')->name('user.destroy');
+
+    // Menu
+    Route::get('/menu', 'MenuController@index')->name('menu.index');
+    Route::get('/table/menu', 'MenuController@dataTable')->name('table.menu');
+    Route::get('/menu/create', 'MenuController@create')->name('menu.create');
+    Route::post('/menu/store', 'MenuController@store')->name('menu.store');
+    Route::get('/edit/{id}', 'MenuController@edit')->name('menu.edit');
+    Route::put('update/{id}', 'MenuController@update')->name('menu.update');
+    Route::delete('delete/{id}', 'MenuController@destroy')->name('menu.destroy');
 
     // table
-    Route::get('/management/table', 'TableController@index')->name('table.index');
+    Route::get('/table', 'TableController@index')->name('table.index');
     Route::get('/table/haha', 'TableController@dataTable')->name('table.coba');
     Route::get('/table/create', 'TableController@create')->name('table.create');
     Route::post('/table/store', 'TableController@store')->name('table.store');
     Route::get('/table/edit/{id}', 'TableController@edit')->name('table.edit');
     Route::put('/table/update/{id}', 'TableController@update')->name('table.update');
     Route::delete('table/delete/{id}', 'TableController@destroy')->name('table.destroy');
-
-    // report
-    Route::get('/report', 'ReportController@index')->name('report.index');
-    Route::get('/report/show', 'ReportController@show')->name('report.showReport');
-    Route::get('/report/dataTable', 'ReportController@dataTable')->name('report.dataTable');
-    Route::get('/report/detail/{id}', 'ReportController@detail')->name('report.detail');
-    Route::get('/report/resume', 'ReportController@resume')->name('report.resume');
-    Route::get('/month', 'ReportController@month')->name('report.month');
-    Route::get('/employee', 'ReportController@employee')->name('report.employee');
-
-    // report purchase
-    Route::get('/purchase', 'ReportController@purchase')->name('purchase.index');
-    Route::get('/totalpurchase', 'ReportController@purchaseTotal')->name('purchase.total');
-
-    // Route::get('/report/charts', 'ReportController@charts')->name('report.showReportCharts');
-
-    // export excel
-    Route::get('/report/show/export', 'ReportController@reportExcel');
-
-    //inventory
-    Route::get('/inventory', 'InventoryController@index')->name('inventory.index');
-    Route::get('/inventory/data', 'InventoryController@dataTable')->name('inventory.data');
-    Route::get('/inventory/create', 'InventoryController@create')->name('inventory.create');
-    Route::post('/inventory/store', 'InventoryController@store')->name('inventory.store');
-    Route::get('/inventory/edit/{id}', 'InventoryController@edit')->name('inventory.edit');
-    Route::put('/inventory/update/{id}', 'InventoryController@update')->name('inventory.update');
-    Route::delete('/inventory/delete/{id}', 'InventoryController@destroy')->name('inventory.destroy');
-    Route::get('/inventoryReport', 'InventoryController@reportInventory')->name('inventory.report');
 
     //PPN
     Route::get('/ppn', 'PpnController@index')->name('ppn.index');
@@ -143,12 +125,34 @@ Route::middleware(['auth', 'VerifyAdmin'])->group(function () {
     Route::put('/inventmenu/update/{id}', 'InventoryMenuController@update')->name('inventmenu.update');
     Route::delete('/inventmenu/delete/{id}', 'InventoryMenuController@destroy')->name('inventmenu.destroy');
 
-    //roombooking
-    Route::get('/bookingroom', 'RoomBookingController@index')->name('roombooking.index');
-    Route::get('/bookingroom/data', 'RoomBookingController@dataTable')->name('roombooking.data');
-    Route::get('/bookingroom/create', 'RoomBookingController@create')->name('roombooking.create');
-    Route::post('/bookingroom/store', 'RoomBookingController@store')->name('roombooking.store');
-    Route::get('/bookingroom/edit/{id}', 'RoomBookingController@edit')->name('roombooking.edit');
-    Route::put('/bookingroom/update/{id}', 'RoomBookingController@update')->name('roombooking.update');
-    Route::delete('/bookingroom/delete/{id}', 'RoomBookingController@destroy')->name('roombooking.destroy');
+    //inventory
+    Route::get('/inventory', 'InventoryController@index')->name('inventory.index');
+    Route::get('/inventory/data', 'InventoryController@dataTable')->name('inventory.data');
+    Route::get('/inventory/create', 'InventoryController@create')->name('inventory.create');
+    Route::post('/inventory/store', 'InventoryController@store')->name('inventory.store');
+    Route::get('/inventory/edit/{id}', 'InventoryController@edit')->name('inventory.edit');
+    Route::put('/inventory/update/{id}', 'InventoryController@update')->name('inventory.update');
+    Route::delete('/inventory/delete/{id}', 'InventoryController@destroy')->name('inventory.destroy');
+    Route::get('/inventoryReport', 'InventoryController@reportInventory')->name('inventory.report');
+});
+
+Route::group(['middleware' => ['role:super admin']], function () {
+    // report
+    Route::get('/report', 'ReportController@index')->name('report.index');
+    Route::get('/report/show', 'ReportController@show')->name('report.showReport');
+    Route::get('/report/dataTable', 'ReportController@dataTable')->name('report.dataTable');
+    Route::get('/report/detail/{id}', 'ReportController@detail')->name('report.detail');
+    Route::get('/report/resume', 'ReportController@resume')->name('report.resume');
+    Route::get('/month', 'ReportController@month')->name('report.month');
+    Route::get('/month/chart', 'ReportController@month')->name('report.chart');
+    Route::get('/employee', 'ReportController@employee')->name('report.employee');
+
+    // report purchase
+    Route::get('/purchase', 'ReportController@purchase')->name('purchase.index');
+    Route::get('/totalpurchase', 'ReportController@purchaseTotal')->name('purchase.total');
+
+    // Route::get('/report/charts', 'ReportController@charts')->name('report.showReportCharts');
+
+    // export excel
+    Route::get('/report/show/export', 'ReportController@reportExcel')->name('report.excel');
 });

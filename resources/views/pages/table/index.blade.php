@@ -3,7 +3,7 @@
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col-lg-8">
+        <div class="col-md-12">
             <div class="card mt-3">
                 <div class="card-header" style="background-color:#295192">
                     <h5 class="card-title mt-1 text-white"><i class="fas fa-chair"></i> Table
@@ -37,10 +37,10 @@
             serverSide: true,
             ajax: "{{ route('table.coba') }}",
             columns: [
-                {data: 'DT_RowIndex', name: 'id', width: '20px'},
-                {data: 'name', name: 'name'},
-                {data: 'status', name: 'status'},
-                {data: 'action', name: 'action', orderable: false, searchable: false, width: '15%'}
+                {data: 'DT_RowIndex', name: 'id', width: '10%'},
+                {data: 'name', name: 'name',width: '25%'},
+                {data: 'status', name: 'status', width: '25%'},
+                {data: 'action', name: 'action', orderable: false, searchable: false, width: '25%'}
             ]
         });
 

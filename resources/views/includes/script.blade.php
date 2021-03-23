@@ -21,7 +21,7 @@
 <!-- Bootstrap 4 -->
 <script src="{{asset('/dashboard/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 <!-- ChartJS -->
-<script src="{{asset('/dashboard/plugins/chart.js/Chart.min.js')}}"></script>
+<script src="{{asset('/dashboard/plugins/chart.js/Chart.min.js')}}" defer></script>
 <!-- Sparkline -->
 <script src="{{asset('/dashboard/plugins/sparklines/sparkline.js')}} "></script>
 <!-- JQVMap -->
@@ -45,11 +45,11 @@
 <!-- AdminLTE App -->
 <script src="{{asset('/dashboard/dist/js/adminlte.js')}}"></script>
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
-<script src="{{asset('/dashboard/dist/js/pages/dashboard.js')}}"></script>
+{{-- <script src="{{asset('/dashboard/dist/js/pages/dashboard.js')}}"></script> --}}
 <!-- AdminLTE for demo purposes -->
-<script src="{{asset('/dashboard/dist/js/demo.js')}}"></script>
+{{-- <script src="{{asset('/dashboard/dist/js/demo.js')}}"></script> --}}
 
-@yield('charts')
+{{-- @yield('charts') --}}
 
 
 

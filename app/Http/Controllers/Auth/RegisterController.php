@@ -8,6 +8,8 @@ use App\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Models\Role;
 
 class RegisterController extends Controller
 {
@@ -22,7 +24,7 @@ class RegisterController extends Controller
     |
     */
 
-    use RegistersUsers;
+    use RegistersUsers, HasRoles;
 
     /**
      * Where to redirect users after registration.
@@ -65,11 +67,12 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $register = User::create([
             'name' => $data['name'],
             'phone_number' => $data['phone_number'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+        return $register->assignRole('super admin');
     }
 }

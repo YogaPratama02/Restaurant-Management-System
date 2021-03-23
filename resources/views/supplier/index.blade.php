@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-md-12">
                 <div class="card mt-3">
                     <div class="card-header" style="background-color:#295192">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> Purchase
@@ -39,12 +39,12 @@
         serverSide: true,
         ajax: "{{ route('supplier.data') }}",
         columns: [
-            {data: 'DT_RowIndex', name: 'id', width: '20px'},
-            {data: 'date', name: 'date'},
-            {data: 'name', name: 'name'},
-            {data: 'total', name: 'total'},
-            {data: 'user_name', name: 'user_name'},
-            {data: 'action', name: 'action', orderable: false, searchable: false, width: '15%'}
+            {data: 'DT_RowIndex', name: 'id', width: '10%'},
+            {data: 'date', name: 'date', width: '15%'},
+            {data: 'name', name: 'name', width: '15%'},
+            {data: 'total', name: 'total', width: '15%'},
+            {data: 'user_name', name: 'user_name', width: '15%'},
+            {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
         ]
     });
 

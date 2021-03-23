@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 use App\User;
 
 class UserController extends Controller
@@ -16,8 +17,9 @@ class UserController extends Controller
 
     public function create()
     {
-        $users = new User();
-        return view('pages.user.formuser', compact('users'));
+        $model = new User();
+        $model['roles'] = Role::all()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->pluck('name', 'id');
+        return view('pages.user.formuser', ['model' => $model]);
     }
 
     public function store(Request $request)
@@ -26,8 +28,7 @@ class UserController extends Controller
             'name' => 'required|unique:users|max:255',
             'phone_number' => 'required|numeric',
             'email' => 'required|email|unique:users|max:255',
-            'password' => 'required|min:6',
-            'role' => 'required'
+            'password' => 'required|min:6'
         ]);
 
         $user = new User();
@@ -35,15 +36,16 @@ class UserController extends Controller
         $user->phone_number = $request->phone_number;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
-        $user->role = $request->role;
         $user->save();
+        $user->assignRole($request->input('role'));
         // return json_encode(true);
     }
 
     public function edit($id)
     {
-        $users = User::findOrFail($id);
-        return view('pages.user.formuser', compact('users'));
+        $model = User::findOrFail($id);
+        $model['roles'] = Role::all()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->pluck('name', 'id');
+        return view('pages.user.formuser', ['model' => $model]);
     }
 
     public function update(Request $request, $id)
@@ -52,8 +54,7 @@ class UserController extends Controller
             'name' => 'required|max:255',
             'phone_number' => 'required|numeric',
             'email' => 'required|email|max:255',
-            'password' => 'required|min:6',
-            'role' => 'required'
+            'password' => 'required|min:6'
         ]);
 
         $user = User::find($id);
@@ -61,9 +62,8 @@ class UserController extends Controller
         $user->phone_number = $request->phone_number;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
-        $user->role = $request->role;
+        $user->syncRoles($request->input('role'));
         $user->save();
-        // return json_encode(true);
     }
 
     public function destroy($id)
@@ -83,8 +83,11 @@ class UserController extends Controller
                     'url_destroy' => route('user.destroy', $users->id)
                 ]);
             })
+            ->addColumn('role', function ($users) {
+                return $users->roles()->pluck('name')->toArray();
+            })
             ->addIndexColumn()
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'role'])
             ->make(true);
     }
 }

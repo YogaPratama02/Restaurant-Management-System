@@ -1,10 +1,9 @@
 @extends('layouts.default')
 
 @section('content')
-
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-md-12">
                 <div class="card mt-3">
                     <div class="card-header" style="background-color:#295192">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-align-justify"></i> Category
@@ -31,39 +30,15 @@
 
 @push('after-script')
     <script type="text/javascript">
-        // $(document).ready(function() {
-        //     $('#datatable').DataTable({
-        //         responsive: true,
-        //         processing: true,
-        //         serverSide: true,
-        //         ajax: "{{ route('pages.management.category') }}",
-        //         columns: [{
-        //                 data: 'DT_RowIndex',
-        //                 name: 'id'
-        //             },
-        //             {
-        //                 data: 'name',
-        //                 name: 'name'
-        //             },
-        //             {
-        //                 data: 'action',
-        //                 name: 'action',
-        //                 orderable: false,
-        //                 searchable: false
-        //             },
-        //         ]
-        //     });
-        // });
-
         $('#datatable').DataTable({
             responsive: true,
             processing: true,
             serverSide: true,
             ajax: "{{ route('pages.management.category') }}",
             columns: [
-                {data: 'DT_RowIndex', name: 'id', width: '20px'},
+                {data: 'DT_RowIndex', name: 'id'},
                 {data: 'name', name: 'name'},
-                {data: 'action', name: 'action', orderable: false, searchable: false, width: '15%'}
+                {data: 'action', name: 'action', orderable: false, searchable: false}
             ]
         });
 
@@ -87,29 +62,23 @@
             $('#modal-form').modal('show');
         });
 
-
-
         $('body').on('submit', '.cobaaja', function (event) {
             event.preventDefault();
 
             var form = $('#modal-form form'),
                 url = form.attr('action'),
                 method = form.attr('method');
-                // method = $('input[name=_method]').val() == undefined ? "POST" ? "PUT";
 
             form.find('.help-block').remove();
             form.find('.form-group').removeClass('has-error');
-            // $('#validation-errors').html('');
 
             $.ajax({
                 url: url,
                 method: method,
                 data: form.serialize(),
                 success: function(response) {
-                    form.trigger('reset');
                     $('#modal-form').modal('hide');
                     $('#datatable').DataTable().ajax.reload();
-
                     Swal.fire({
                         position: 'center',
                         icon: 'success',
@@ -178,9 +147,6 @@
                 }
             });
         });
-
-
-
     </script>
 
 @endpush

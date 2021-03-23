@@ -7,9 +7,12 @@ use App\Category;
 use Carbon\Carbon;
 use App\Menu;
 use DataTables;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
 class CategoryController extends Controller
 {
+
     /**
      * Display a listing of the resource.
      *
@@ -17,15 +20,8 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
+
         $categories = Category::all();
-        // if ($request->ajax()) {
-        //     return datatables()->of($categories)
-        //         ->addIndexColumn()
-        //         ->editColumn('edit', function ($categories) {
-        //             return $categories;
-        //         })
-        //         ->make(true);
-        // }
         return view('pages.management.category');
     }
 
@@ -51,9 +47,7 @@ class CategoryController extends Controller
         $request->validate([
             'name' => 'required|unique:categories|max:255'
         ]);
-        //     // $category = $request->all();
-
-
+        $imageName = "noimage.png";
         $category = new Category;
         $category->name = $request->name;
         $current = new Carbon;
@@ -61,6 +55,7 @@ class CategoryController extends Controller
         $category->created_at = $current;
         $category->updated_at = $current;
         $category->save();
+        return json_encode(true);
     }
 
     /**
@@ -96,14 +91,17 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|unique:categories|max:255'
+            'name' => 'required|max:255'
         ]);
+        $category = Category::findOrFail($id);
 
-        $categories = Category::findOrFail($id);
+        $category->name = $request->name;
         $current = new Carbon;
         $current->timezone('GMT+7');
-        $categories->updated_at = $current;
-        $categories->update($request->all());
+        $category->updated_at = $current;
+        $category->save();
+        return json_encode(true);
+        // $category->update($request->all());
         // $category = Category::where('name', $request->oldname)->put(['name'=> $request->newname]);
     }
 

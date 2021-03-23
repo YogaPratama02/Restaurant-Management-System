@@ -1,6 +1,6 @@
-{!! Form::model($users, [
-    'route' => $users->exists ? ['user.update', $users->id] : 'user.store',
-    'method' => $users->exists ? 'PUT' : 'POST',
+{!! Form::model($model, [
+    'route' => $model->exists ? ['user.update', $model->id] : 'user.store',
+    'method' => $model->exists ? 'PUT' : 'POST',
     'class' => 'cobauser'
 ]) !!}
 
@@ -15,7 +15,7 @@
     </div>
     <div class="form-group">
         <label for="role" class="control-label">Role</label>
-        {!! Form::select('role', ['admin' => 'admin', 'cashier' => 'cashier'], null,['class'=> 'form-control', 'id' => 'role', 'placeholder'=>'Select Role..']) !!}
+        {!! Form::select('role', $model->roles, null,['class'=> 'form-control', 'id' => 'role', 'name' => 'role', 'placeholder'=>'Select Role..']) !!}
     </div>
     <div class="form-group">
         <label for="email" class="control-label">Email</label>

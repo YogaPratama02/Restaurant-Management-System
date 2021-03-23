@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-md-12">
                 <div class="card mt-3">
                     <div class="card-header" style="background-color:#295192">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> Inventory
@@ -38,11 +38,11 @@
         serverSide: true,
         ajax: "{{ route('inventmenu.data') }}",
         columns: [
-            {data: 'DT_RowIndex', name: 'id', width: '20px'},
-            {data: 'inventory_id', name: 'inventory_id'},
-            {data: 'menu_id', name: 'menu_id'},
-            {data: 'consumption', name: 'consumption'},
-            {data: 'action', name: 'action', orderable: false, searchable: false, width: '15%'}
+            {data: 'DT_RowIndex', name: 'id', width: '10%'},
+            {data: 'inventory_id', name: 'inventory_id', width: '15%'},
+            {data: 'menu_id', name: 'menu_id', width: '15%'},
+            {data: 'consumption', name: 'consumption', width: '10%'},
+            {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
         ]
     });
 

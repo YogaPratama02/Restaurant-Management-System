@@ -425,3 +425,242 @@ class CashierController extends Controller
         return view('cashier.showReceipt')->with('sale', $sale)->with('saleDetails', $saleDetails);
     }
 }
+
+
+<div class="mb-1 hehe">
+                        <button class="btn btn-outline-secondary btn-menu" data-id="' . $menu->id . '" disabled>
+                        <img class="img-fluid justify-content-between images" style="width:110px; height:90px;" src="' . url('/menu_images/' . $menu->image) . '"/>
+                        <div class="banner-text">
+                            <h4 class="grid-content">Sold Out</h4>
+                            <h5>' . $menu->name . '</h5>
+                            <p> Rp' . number_format($menu->price, 3) . '</p>
+                        </div>
+                        </button>
+                    </div>
+                    @extends('layouts.default')
+
+@section('content')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css">
+    <div class="container">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 form-group input-daterange">
+                    <input type="text" name="date_start" id="date_start" class="form-control text-center" placeholder="from date.." readonly style="width: 300px;" />
+                </div>
+                <div class="col-md-4 form-group dt2">
+                    <input type="text" name="date_end" id="date_end" class="form-control text-center" placeholder="end date.." readonly style="width: 300px;"  />
+                </div>
+                <div class="col-md-4">
+                    <button type="button" name="filter" id="filter" class="btn btn-primary">Filter</button>
+                    <button type="button" name="refresh" id="refresh" class="btn btn-primary">Refresh</button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-12 text-center">
+                        <div style="font-size: 26px; font-weight: bold">Monthly Sale Report</div>
+                        <span id="e" style="font-size: 24px"></span>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered text-center" style="width:100%">
+                            <thead>
+                                <tr class="text-lite text-center">
+                                    <th scope="col">No</th>
+                                    <th scope="col">Month</th>
+                                    <th scope="col">Total HPP</th>
+                                    <th scope="col">Total Price</th>
+                                    <th scope="col">Total Sale</th>
+                                </tr>
+                            </thead>
+                            <tbody id="d">
+
+                            </tbody>
+                            <tfoot id="hi">
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" id="c"></div>
+                <div class="col-md-12" id="u"></div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card-body">
+                        <table class="table table-bordered text-center" style="width:100%">
+                            <thead>
+                                <tr class="text-lite text-center">
+                                    <th scope="col">No</th>
+                                    <th scope="col">Menu Name</th>
+                                    <th scope="col">Total Sold</th>
+                                </tr>
+                            </thead>
+                            <tbody id="k">
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12" >
+                    <canvas id="chart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
+
+@push('after-script')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+
+    <script type="text/javascript">
+        // $(document).ready(function(){
+                $('#date_start').datepicker({
+                    format: 'dd-mm-yyyy',
+                    minViewMode: 1,
+                    autoclose: true
+                    // viewMode: "months", //this
+                    // minViewMode: "months",
+                });
+
+                // var today = new Date();
+                // var month = today.getMonth();
+                // var year = today.getFullYear();
+
+                // var lastDate = new Date(year, month + 1, 0);
+                // var lastDay = lastDate.getDate();
+
+                $("#date_end").datepicker({
+                    format: 'dd-mm-yyyy',
+                    minViewMode: 1,
+                    autoclose: true,
+                    }).on('changeDate',function(e)
+                        {
+                            $("#date_end").datepicker('update', new Date(e.date.getFullYear(), e.date.getMonth() + 1, 0));
+                        });
+
+                month_data();
+                function month_data(date_start = '', date_end='')
+                {
+                    $.ajax({
+                        url: "{{route('report.month')}}",
+                        type: "GET",
+                        dataType:"json",
+                        data: {date_start: date_start, date_end:date_end},
+                        success: function(data)
+                        {
+                            $('#d').html(data.menuz);
+                            $('#hi').html(data.tal);
+                            $('#c').html(data.cash);
+                            $('#u').html(data.bank);
+                            $('#k').html(data.menu);
+                        },
+                        error: function(data)
+                        {
+                            alert('not responding');
+                        }
+                    });
+                }
+
+
+                $('#filter').click(function(){
+                    var date_start = $('#date_start').val();
+                    var date_end = $('#date_end').val();
+                    if(date_start != '' && date_end != ''){
+                        $('#e').html(date_start).append(' to ', date_end );
+                        month_data(date_start, date_end);
+                    }else{
+                        alert('Both date is required');
+                    }
+                });
+
+                $('#refresh').click(function(){
+                    $('#date_start').val('');
+                    $('#date_end').val('');
+                    $('#e').html('');
+                    month_data();
+                });
+            // });
+            var data = "{{ route('report.month') }}";
+            let myChart = document.getElementById('chart').getContext('2d');
+            let a = new Chart(myChart, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(data),
+                    datasets: [{
+                        label: 'Population',
+                        data: Object.values(data),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.6)',
+                            'rgba(54, 162, 235, 0.6)',
+                            'rgba(255, 206, 86, 0.6)',
+                            'rgba(75, 99, 132, 0.6)',
+                            'rgba(153, 102, 255, 0.6)',
+                            'rgba(255, 159, 64, 0.6)',
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#777',
+                    }]
+                },
+                options: {}
+            });
+    </script>
+@endpush
+<?php
+
+namespace App\Exports;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Sale;
+use Illuminate\Contracts\View\View;
+use Maatwebsite\Excel\Concerns\FromView;
+
+class SaleReportExport implements FromView
+{
+    private $date_start;
+    private $date_end;
+    private $sales;
+    private $totalSale;
+    public function __construct(Request $request)
+    {
+        $date_start = date("Y-m-d H:i:s", strtotime($date_start));
+        $date_end = date("Y-m-d H:i:s", strtotime($date_end));
+
+        $sales = Sale::whereBetween('updated_at', [$date_start, $date_end])->where('sale_status', 'paid')->get();
+        $totalSale = $sales->sum('total_price');
+        $this->date_start = $date_start;
+        $this->date_end = $date_end;
+        $this->sales = $sales;
+        $this->totalSale = $totalSale;
+    }
+
+    public function view(): View
+    {
+        return view('exports.salereport', [
+            'date_start' => $this->date_start,
+            'date_end' => $this->date_end,
+            'sales' => $this->sales,
+            'totalSale' => $this->totalSale
+        ]);
+    }
+}
+
+excel_data();
+                function excel_data(date_start = '', date_end=''){
+                $(document).on('click', '.excel', function(){
+                    $.ajax({
+                        method: "GET",
+                        url: "{{route('report.excel')}}",
+                        data: {date_start: date_start, date_end:date_end},
+                        success: function(response) {
+                            window.location.href = "{{route('report.excel')}}";
+                        }
+                    });
+                    // console.log({date_start: date_start, date_end:date_end});
+                });
+            }
+
+

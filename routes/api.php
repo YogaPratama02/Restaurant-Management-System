@@ -21,9 +21,7 @@ Route::post('/cashier/decrease-quantity', 'CashierController@decreaseQuantity');
 Route::get('/report/dataTable', 'ReportController@dataTable')->name('report.dataTable');
 Route::get('/report/detail/{id}', 'ReportController@detail')->name('report.detail');
 
-Route::post('/cashier/confirmAgain', 'CashierController@confirmAgain');
-Route::get('/report/resume', 'ReportController@resume')->name('report.resume');
-Route::get('/cashier/jsonReceipt/{saleID}', 'CashierController@jsonReceipt');
+Route::get('/month', 'ReportController@month')->name('report.month');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

@@ -61,7 +61,7 @@ $(document).ready(function(){
             serverSide: true,
             dom: 'Bfrtip',
             buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
+            'excel', 'pdf'
             ],
             ajax: {
                 url: "{{ route('purchase.index') }}",

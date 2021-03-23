@@ -16,9 +16,9 @@ class VerifyAdmin
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user()->checkAdmin() && Auth::check()) {
-            return $next($request);
-        }
-        return redirect('/login');
+        // if (Auth::user()->checkAdmin() && Auth::check()) {
+        //     return $next($request);
+        // }
+        // return redirect('/login');
     }
 }

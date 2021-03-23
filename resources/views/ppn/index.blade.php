@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-md-12">
                 <div class="card mt-3">
                     <div class="card-header" style="background-color:#295192">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> Ppn
@@ -36,9 +36,9 @@
         serverSide: true,
         ajax: "{{ route('ppn.data') }}",
         columns: [
-            {data: 'DT_RowIndex', name: 'id', width: '20px'},
-            {data: 'ppn', name: 'ppn'},
-            {data: 'action', name: 'action', orderable: false, searchable: false, width: '15%'}
+            {data: 'DT_RowIndex', name: 'id', width: '10%'},
+            {data: 'ppn', name: 'ppn', width: '20%'},
+            {data: 'action', name: 'action', orderable: false, searchable: false, width: '25%'}
         ]
     });
 

@@ -21,6 +21,7 @@ class CreateSaleDetailsTable extends Migration
             $table->decimal('menu_price')->nullable();
             $table->integer('quantity');
             $table->integer('menu_discount');
+            $table->string('note')->default("");
             $table->string('status')->default('NoConfirm');
             $table->foreign('sale_id')->references('id')->on('sales')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('menu_id')->references('id')->on('menus')->onUpdate('cascade')->onDelete('cascade');

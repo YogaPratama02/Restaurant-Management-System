@@ -18,6 +18,7 @@
                     <div class="card ml-3 mr-3">
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">{{$saleDetail->menu_name}} {{$saleDetail->quantity}}</li>
+                            <li class="list-group-item">{{$saleDetail->note}}</li>
                             @if ($saleDetail->status == 'confirm')
                                 <div class="btn btn-primary" id="ayo" data-id='{!! $saleDetail->id !!}'>Confirm</div>
                             @endif
@@ -36,6 +37,7 @@
             <div class="card ml-3 mr-3">
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">{{$saleDetail->menu_name}} {{$saleDetail->quantity}}</li>
+                    <li class="list-group-item">{{$saleDetail->note}}</li>
                     @if ($saleDetail->status == 'confirm')
                         <div class="btn btn-primary" id="ayo" data-id='{!! $saleDetail->id !!}'>Confirm</div>
                     @endif

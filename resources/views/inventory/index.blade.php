@@ -3,7 +3,7 @@
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-md-10">
+            <div class="col-md-12">
                 <div class="card mt-3">
                     <div class="card-header" style="background-color:#295192">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> Inventory
@@ -57,12 +57,12 @@
         serverSide: true,
         ajax: "{{ route('inventory.data') }}",
         columns: [
-            {data: 'DT_RowIndex', name: 'id', width: '20px'},
-            {data: 'ingredients', name: 'ingredients'},
-            {data: 'stock_quantity', name: 'stock_quantity'},
-            {data: 'alert_quantity', name: 'alert_quantity'},
-            {data: 'unit', name: 'unit'},
-            {data: 'action', name: 'action', orderable: false, searchable: false, width: '15%'}
+            {data: 'DT_RowIndex', name: 'id', width: '10%'},
+            {data: 'ingredients', name: 'ingredients', width: '15%'},
+            {data: 'stock_quantity', name: 'stock_quantity', width: '10%'},
+            {data: 'alert_quantity', name: 'alert_quantity', width: '10%'},
+            {data: 'unit', name: 'unit', width: '15%'},
+            {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
         ]
     });
 

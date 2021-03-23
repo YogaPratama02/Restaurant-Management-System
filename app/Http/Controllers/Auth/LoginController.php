@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Spatie\Permission\Models\Role;
 
 class LoginController extends Controller
 {
@@ -30,8 +31,8 @@ class LoginController extends Controller
     // protected $redirectTo = RouteServiceProvider::HOME;
     protected function authenticated(Request $request, $user)
     {
-        if ($user->checkAdmin()) {
-            return redirect('/management/category');
+        if ($user->hasRole('super admin')) {
+            return redirect('/category');
         }
 
         return redirect()->route('cashier.index');
@@ -44,10 +45,34 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest')->except('logout');
+        // $this->middleware(['role:super-admin']);
     }
 
     public function phone_number()
     {
         return 'phone_number';
     }
+
+    // public function create()
+    // {
+    //     Role::create([
+    //         'name' => 'super admin',
+    //         'guard_name' => 'web'
+    //     ]);
+
+    //     Role::create([
+    //         'name' => 'admin',
+    //         'guard_name' => 'web'
+    //     ]);
+
+    //     Role::create([
+    //         'name' => 'cashier',
+    //         'guard_name' => 'web'
+    //     ]);
+
+    //     Role::create([
+    //         'name' => 'customers',
+    //         'guard_name' => 'web'
+    //     ]);
+    // }
 }
