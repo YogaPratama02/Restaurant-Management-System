@@ -27,7 +27,7 @@
                     </div>
                     <div class="card-body">
                         <table class="table table-bordered text-center" style="width:100%">
-                            <thead>
+                            <thead class="text-white" style="background-color:#295192">
                                 <tr class="text-lite text-center">
                                     <th scope="col">No</th>
                                     <th scope="col">Month</th>
@@ -46,14 +46,32 @@
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12" id="c"></div>
-                <div class="col-md-12" id="u"></div>
+                <div class="col-md-12">
+                    <div class="card-body">
+                        <table class="table table-bordered text-center" style="width:100%">
+                            <thead class="text-white" style="background-color:#295192">
+                                <tr class="text-lite text-center">
+                                    <th scope="col">Total Cash</th>
+                                    <th scope="col">Total Bank Transfer</th>
+                                    <th scope="col">Total Credit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="cash"></td>
+                                    <td class="transfer"></td>
+                                    <td class="credit"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card-body">
                         <table class="table table-bordered text-center" style="width:100%">
-                            <thead>
+                            <thead class="text-white" style="background-color:#295192">
                                 <tr class="text-lite text-center">
                                     <th scope="col">No</th>
                                     <th scope="col">Menu Name</th>
@@ -82,7 +100,7 @@
     <script type="text/javascript">
         // $(document).ready(function(){
                 $('#date_start').datepicker({
-                    format: 'dd-mm-yyyy',
+                    format: 'yyyy-mm-dd',
                     minViewMode: 1,
                     autoclose: true
                     // viewMode: "months", //this
@@ -90,13 +108,13 @@
                 });
 
                 $("#date_end").datepicker({
-                    format: 'dd-mm-yyyy',
+                    format: 'yyyy-mm-dd',
                     minViewMode: 1,
                     autoclose: true,
-                    }).on('changeDate',function(e)
-                        {
-                            $("#date_end").datepicker('update', new Date(e.date.getFullYear(), e.date.getMonth() + 1, 0));
-                        });
+                }).on('changeDate',function(e)
+                    {
+                        $("#date_end").datepicker('update', new Date(e.date.getFullYear(), e.date.getMonth() + 1, 0));
+                    });
 
                 month_data();
                 function month_data(date_start = '', date_end='')
@@ -110,9 +128,10 @@
                         {
                             $('#d').html(data.menuz);
                             $('#hi').html(data.tal);
-                            $('#c').html(data.cash);
-                            $('#u').html(data.bank);
                             $('#k').html(data.menu);
+                            $('.cash').html(data.cash);
+                            $('.transfer').html(data.bank);
+                            $('.credit').html(data.card);
                         },
                         error: function(data)
                         {
@@ -121,58 +140,16 @@
                     });
                 }
 
-                // $('.excel').click(function(){
-                //     $.ajax({
-                //         method : 'GET',
-                //         url: "{{route('report.excel')}}",
-                //         data: {
-                //             'date_start' : $('#date_start').val(),
-                //             'date_end' : $('#date_end').val(),
-                //         },
-                //     });
-                // });
-
                 $('.excel').click(function(){
                     var date_start = $('#date_start').val();
                     var date_end = $('#date_end').val();
+                    // console.log(date_start);
                     if(date_start != '' && date_end != ''){
                         window.location.href = "/report/show/export?date_start="+date_start+"&date_end="+date_end;
                     }else{
                         alert('Both date is required');
                     }
                 });
-                // $('.excel').click(function(){
-                //     var date_start = $('#date_start').val();
-                //     var date_end = $('#date_end').val();
-                //     $.ajax({
-                //         url:"{{ route('report.excel') }}",
-                //         data:{date_start:date_start, date_end:date_end},
-                //         dataType:"json",
-                //         success: function(data){
-                //             window.location.href = "/report/show/export?date_start="+date_start+"&date_end="+date_end;
-                //         }
-                //     });
-                // });
-
-                // $(document).on('click', '.excel', function(){
-                //     $.ajax({
-                //         method: "GET",
-                //         url: "{{route('report.excel')}}",
-                //         responseType: 'blob', // important
-                //         data: {
-                //             'date_start' : $('#date_start').val(),
-                //             'date_end' : $('#date_end').val(),
-                //         },
-                //         success: function(response) {
-                //             window.location.href = "{{route('report.excel')}}";
-
-                //         },
-                //         error: function(response){
-                //             console.log(date_start);
-                //         }
-                //     });
-                // });
-
 
                 $('#filter').click(function(){
                     var date_start = $('#date_start').val();

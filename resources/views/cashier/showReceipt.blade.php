@@ -9,14 +9,13 @@
         <h3 id="restaurant-name">{{ __("The Professor's Caffe") }}</h3>
     </div>
     <div class="receipt text-center" style="text-align: center;">
-        <p>JL. KH Ahmad Dalan No. 18, Kebayoran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta, 121 30</p>
+        <p>JL. KH Ahmad Dalan No. 18, Kebay<br>oran Baru, Kramat Peta, Kota Jak<br>arta Selatan, DKI Jakarta,121 30</p>
         <p>081381517194</p>
-        {{-- <p>Invoice: <strong>{{$sale->id}}</strong></p> --}}
     </div>
     <div class="receipt-body">
         <table class="table-sale-detail">
             <thead>
-                <tr>
+                <tr class="text-left">
                     <th>Menu</th>
                     <th>Qty</th>
                     <th>Price</th>
@@ -26,7 +25,7 @@
             </thead>
             <tbody>
                 @foreach ($saleDetails as $saleDetail)
-                    <tr>
+                    <tr class="text-left">
                         <td width="160">{{$saleDetail->menu_name}}</td>
                         <td width="50">{{$saleDetail->quantity}}</td>
                         <td width="60">{{number_format($saleDetail->menu_price * $saleDetail->quantity, 0, ',', '.' )}}</td>
@@ -40,11 +39,9 @@
             <tbody>
                 <tr>
                     <td>VAT</td>
-                    @foreach ($ppn as $ppn)
-                        <td>{{$ppn->ppn}}%</td>
-                    @endforeach
+                    <td>{{$total}}%</td>
                     <td>Total</td>
-                    <td>Rp{{number_format($sale->total_price + $sale->total_price * $ppn->ppn / 100, 0, ',', '.' )}}</td>
+                    <td>Rp{{number_format($sale->total_price + $sale->total_price * $total/ 100, 0, ',', '.' )}}</td>
                     {{-- <td width="60">{{$saleDetail->menu_discount}}</td> --}}
                 </tr>
                 <tr>
@@ -71,18 +68,15 @@
                 Back To Cashier
             </button>
         </a>
-        <button class="btn btn-print" type="button" id="huehue">
+        <a href="{{ url('/cashier/pdf/'. $sale->id) }}" class="btn btn-print" type="button" id="huehue">
             Print
-        </button>
-        <a href="my.bluetoothprint.scheme://http://10.96.48.97:8000/cashier/showReceipt/245">Print</a>
+        </a>
     </div>
 </div>
 @endsection
 
 @push('after-script')
-<script>
-    $('#huehue').click(function(){
-        alert('haha')
-    })
+<script src="https://cdn.jsdelivr.net/npm/recta/dist/recta.js"></script>
+<script type="text/javascript">
 </script>
 @endpush

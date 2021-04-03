@@ -12,7 +12,7 @@
       <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
-          <img src="{{url('/dashboard/dist/img/user2-160x160.jpg')}}" class="img-circle elevation-2" alt="User Image">
+          <img src="{{url('images/restaurant.svg' )}}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
           <a href="#" class="d-block">The Proffesor's Caffe</a>
@@ -32,7 +32,7 @@
         </li>
         <li class="nav-item">
             @if(Auth::user()->hasRole('super admin|admin'))
-            <a href="{{route('menu.index')}}" class="nav-link {{(request()->is('*menu')) ? 'active' : '' }}">
+            <a href="{{route('menu.index')}}" class="nav-link {{(request()->is('menu*')) ? 'active' : '' }}">
               <i class="fas fa-hamburger"></i>
                 <p>Menu</p>
             </a>
@@ -145,12 +145,6 @@
               <a href="{{route('purchase.index')}}" class="nav-link {{(request()->is('purchase*')) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Purchase Report</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="pages/charts/uplot.html" class="nav-link">
-                <i class="far fa-circle nav-icon"></i>
-                <p>uPlot</p>
               </a>
             </li>
           </ul>

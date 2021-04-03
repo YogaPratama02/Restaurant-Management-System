@@ -52,43 +52,7 @@
 
 @push('after-script')
     <script type="text/javascript">
-        // $('#datatable').DataTable({
-        //     responsive: true,
-        //     processing: true,
-        //     serverSide: true,
-        //     ajax: "{{ route('report.dataTable') }}",
-        //     columns: [
-        //         {data: 'DT_RowIndex', name: 'id', width: '15px'},
-        //         {data: 'updated_at', name: 'updated_at'},
-        //         {data: 'user_name', name: 'user_name'},
-        //         {data: 'total_hpp', name: 'total_hpp'},
-        //         {data: 'total_price', name: 'total_price'},
-        //         {data: 'total_vat', name: 'total_vat'},
-        //         {data: 'total_vatprice', name: 'total_vatprice'},
-        //         {data: 'payment_type', name: 'payment_type'},
-        //         {data: 'action', name: 'action', orderable: false, searchable: false}
-        //     ]
-        // });
 
-        // $('body').on('click', '.view-detail', function(event){
-        //     event.preventDefault();
-        //     var me = $(this),
-        //         url = me.attr('href');
-
-        //     $.ajax({
-        //         url: url,
-        //         dataType: 'html',
-        //         success: function(response){
-        //             $('#details').html(response);
-        //             $('.btn-cobi').click(function(response){
-        //                 $('#details').hide();
-        //             });
-        //         }
-        //     });
-        // });
-        // $('body').on('click', '.view-detail', function(response){
-        //     $('#details').show();
-        // });
     </script>
 
 @endpush

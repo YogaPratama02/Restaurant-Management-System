@@ -44,7 +44,7 @@
             {data: 'phone_number', name: 'phone_number', width: '15%'},
             {data: 'role', name: 'role', width: '10%'},
             {data: 'email', name: 'email', width: '20%'},
-            {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+            {data: 'action', name: 'action', orderable: false, searchable: false, width: '30%'}
         ]
     });
 

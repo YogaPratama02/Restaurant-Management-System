@@ -1,9 +1,9 @@
 @extends('layouts.default')
 
 @section('content')
-    <div class="container">
+    <div class="container col-md-12">
         <div class="row justify-content-center">
-            <div class="col-md-12">
+            <div class="">
                 <div class="card mt-3">
                     <div class="card-header" style="background-color:#295192">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-hamburger"></i> Menu
@@ -42,14 +42,14 @@
             serverSide: true,
             ajax: "{{ route('table.menu') }}",
             columns: [
-                {data: 'DT_RowIndex', name: 'id', width: '15px'},
+                {data: 'DT_RowIndex', name: 'id'},
                 {data: 'name', name: 'name'},
                 {data: 'hpp', name: 'hpp'},
                 {data: 'price', name: 'price'},
                 {data: 'image', name: 'image'},
                 {data: 'discount', name: 'discount'},
                 {data: 'category_id', name: 'category_id'},
-                {data: 'action', name: 'action', orderable: false, searchable: false}
+                {data: 'action', name: 'action', orderable: false, searchable: false, width : '70%'}
             ]
         });
 

@@ -23,4 +23,9 @@ class Sale extends Model
     {
         return $this->belongsTo(Role::class);
     }
+
+    public function table()
+    {
+        return $this->belongsTo(Table::class);
+    }
 }

@@ -59,10 +59,10 @@
         columns: [
             {data: 'DT_RowIndex', name: 'id', width: '10%'},
             {data: 'ingredients', name: 'ingredients', width: '15%'},
-            {data: 'stock_quantity', name: 'stock_quantity', width: '10%'},
-            {data: 'alert_quantity', name: 'alert_quantity', width: '10%'},
+            {data: 'stock_quantity', name: 'stock_quantity'},
+            {data: 'alert_quantity', name: 'alert_quantity'},
             {data: 'unit', name: 'unit', width: '15%'},
-            {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+            {data: 'action', name: 'action', orderable: false, searchable: false, width: '30%'}
         ]
     });
 

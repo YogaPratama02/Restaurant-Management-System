@@ -54,7 +54,4 @@
         <button type="submit" class="btn btn-primary" id="modal-btn-save"></button>
     </div>
 
-
-
-
 {!! Form::close() !!}

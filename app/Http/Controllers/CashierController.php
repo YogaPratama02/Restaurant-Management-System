@@ -4,16 +4,16 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Table;
-use App\Room;
 use App\Category;
 use App\Menu;
 use App\Sale;
 use App\SaleDetail;
 use App\InventoryMenu;
+use Illuminate\Support\Facades\DB;
 use App\Inventory;
 use App\Ppn;
 use Carbon\Carbon;
-use app\Widgets\FinishWidget;
+use PDF;
 
 use Illuminate\Support\Facades\Auth;
 
@@ -43,6 +43,7 @@ class CashierController extends Controller
             $html .= '</button>';
             $html .= '</div>';
         }
+
         return $html;
     }
 
@@ -57,7 +58,7 @@ class CashierController extends Controller
 
                 if ($invents->stock_quantity < $invents->alert_quantity) {
                     $html .= '
-                    <div class="col-md-4 mt-2 text-center">
+                    <div class="ml-1 mt-2">
                         <button class="btn btn-outline-secondary btn-menu" data-id="' . $menu->id . '" disabled>
                             <img class="img-fluid" style="height:130px; width:130px;" src="' . url('/menu_images/' . $menu->image) . '">
                             <br>
@@ -71,10 +72,10 @@ class CashierController extends Controller
                     ';
                 } else {
                     $html .= '
-                    <div class="col-md-4 mt-2" text-primary>
+                    <div class="ml-1 mt-2">
                         <button class="btn btn-outline-secondary btn-menu" data-id="' . $menu->id . '">
-                            <img class="img-fluid" style="height:120px; width:110px;" src="' . url('/menu_images/' . $menu->image) . '">
-                            <p class="font-weight-bold text-lg"> ' . $menu->name . '</p>
+                            <img class="rounded" style="height:120px; width:110px;" src="' . url('/menu_images/' . $menu->image) . '">
+                            <p class="font-weight-bold sm" > ' . $menu->name . '</p>
                             Rp' . number_format($menu->price) . '
                         </button>
                     </div>
@@ -89,25 +90,24 @@ class CashierController extends Controller
     {
         $menu = Menu::find($request->menu_id);
         $table_id = $request->table_id;
-        $table_name = $request->table_name;
+        // $table_name = $request->table_name;
         $sale = Sale::where('table_id', $table_id)->where('sale_status', 'unpaid')->first();
         // crate penjualan baru
         if (!$sale) {
             $user = Auth::user();
             $sale = new Sale();
             $sale->table_id = $table_id;
-            $sale->table_name = $table_name;
+            // $sale->table_name = $table_name;
             $sale->user_id = $user->id;
             $sale->user_name = $user->name;
             $sale->save();
             $sale_id = $sale->id;
             // update status table
-            $table = Table::find($table_id);
-            $table->status = "unvailable";
-            $table->save();
+            // $table = Table::find($table_id);
+            // $table->status = "available";
+            // $table->save();
         } else {
             // jika sudah ada order
-
             $sale_id = $sale->id;
             $saledetail = SaleDetail::where('sale_id', $sale_id)->where('menu_id', $menu->id)->where('status', 'NoConfirm')->first();
 
@@ -166,13 +166,43 @@ class CashierController extends Controller
     public function getSaleDetailsByTable($table_id)
     {
         $sale = Sale::where('table_id', $table_id)->where('sale_status', 'unpaid')->first();
-        $html = '';
+        $tables = Table::where('status', 'available')->get();
+        $html['a'] = '';
+        $html['b'] = '';
         // cek jika ada saledetail yang mempunya sale
         if ($sale) {
             $sale_id = $sale->id;
-            $html .= $this->getSaleDetails($sale_id);
+            $html['a'] .= $this->getSaleDetails($sale_id);
+            $html['b'] .= '<button type="button" data-id="' . $sale->table->id . '" class="btn mejaUpdate text-white" style="background-color: #ff7b54;" data-toggle="modal" data-target="#exampleModal">
+                                Move Table
+                            </button>';
+            $html['b'] .= '<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <div class="modal-body text-left">
+                                <div class="form-group">
+                                    <label for="" class="control-label">Select Table</label>
+                                    <select class="form-control riri" id="exampleFormControlSelect1">';
+            foreach ($tables as $table) {
+                $html['b'] .= '<option value="' . $table->id  . '" class="namaTable">' . $table->name . '</option>';
+            }
+            $html['b'] .= '</select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                <button type="button" class="btn btn-primary table_update" data-id="' . $sale->id . '">Update</button>
+                            </div>
+                            </div>
+                        </div>
+                        </div><hr>';
         } else {
-            $html .= '<div class="row justify-content-center align-items-center">
+            $html['a'] .= '<div class="row justify-content-center align-items-center">
                             <h4>No Order</h4>
                         </div>';
         }
@@ -182,7 +212,10 @@ class CashierController extends Controller
     private function getSaleDetails($sale_id)
     {
         $html = '<p hidden>Sale ID: ' . $sale_id . '</p>';
-        $ppn = Ppn::all();
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        $total = $ppn->sum('ppn');
         $saleDetails = SaleDetail::where('sale_id', $sale_id)->get();
         $sale = Sale::all();
 
@@ -198,7 +231,6 @@ class CashierController extends Controller
             </tr>
         </thead>
         <tbody class="text-left">';
-        // $showBtnPayment = true;
         foreach ($saleDetails as $saleDetail) {
             $decreaseButton = '<button class="btn btn-danger btn-sm btn-decrease-quantity" style="background-color: #a6a9b6 disabled>-</button>';
 
@@ -206,7 +238,7 @@ class CashierController extends Controller
                 $decreaseButton = '<button data-id="' . $saleDetail->id . '" class="btn btn-sm btn-decrease-quantity" style="background-color: #a6a9b6">-</button>';
             }
             if ($saleDetail->note == Null) {
-                $b = '<i class="fas fa-pencil-alt ml-2 mr-2" ></i>';
+                $b = '<i class="fas fa-pencil-alt ml-2 mr-2"></i>';
             }
             if ($saleDetail->note != Null) {
                 $b = '<i class="fas fa-comment-dots ml-2 mr-2"></i>';
@@ -222,7 +254,6 @@ class CashierController extends Controller
             }
 
             if ($saleDetail->status == 'confirm' or $saleDetail->status == 'waiting' or $saleDetail->status == 'finish') {
-                // $showBtnPayment = false;
                 // $html .= '<td><a data-id="' . $saleDetail->id . '" class="btn btn-danger btn-delete-saledetail"><i class="fas fa-trash"></i></a></td>';
                 $html .= '
                 <tr>
@@ -234,27 +265,23 @@ class CashierController extends Controller
             }
             if ($saleDetail->status == 'confirm') {
                 $html .=
-                    '<td><a data-id="" class="btn rounded text-white" style="background-color: #ffa45b">Confirm..</a></td>';
+                    '<td><a data-id="" class="btn text-white" style="background-color: #ffa45b; border-radius: 25px;">Confirm..</a></td>';
             }
             if ($saleDetail->status == 'waiting') {
-                $html .= '<td><a data-id="" class="btn rounded text-white" style="background-color: #ffa45b">Waiting..</a></td>';
+                $html .= '<td><a data-id="" class="btn text-white" style="background-color: #ffa45b; border-radius: 25px;">Waiting..</a></td>';
             }
             if ($saleDetail->status == 'finish') {
-                $html .= '<td><a data-id="" class="btn rounded text-white" style="background-color: #ffa45b">Ready..</a></td>';
+                $html .= '<td><a data-id="" class="btn text-white" style="background-color: #ffa45b; border-radius: 25px;">Ready..</a></td>';
             }
 
             $html .= '</tr>';
         }
-        foreach ($ppn as $ppn) {
-            $html .= '<td>PPN: ' . $ppn->ppn . ' %</td>';
-        }
-        $html .= '</tbody></table>';
-        // if ($saleDetail->status == 'NoConfirm') {
-        //     $html .= $notes;
+        // foreach ($ppn as $ppn) {
+        $html .= '<td>PPN: ' . $total . ' %</td>';
         // }
-        $html .= '<div class="note" style="display: none">
+        $html .= '</tbody></table>';
 
-                </div>';
+        $html .= '<div class="note" style="display: none"></div>';
         $html .= '</div>';
         if ($saleDetail->status == 'NoConfirm' && $saleDetail->sale->customer_name != null) {
             $html .= '<td><button data-id="' . $sale_id . '" class="btn rounded btn-block text-white btn-order-again" style="background-color: #ffba08">Confirm..</button></td>';
@@ -262,25 +289,25 @@ class CashierController extends Controller
 
         $sale = Sale::find($sale_id);
         $html .= '<hr>';
-        $html .= '<h3 class="try" data-all="' . ($sale->total_price + ($sale->total_price * $ppn->ppn / 100)) . '">Total: Rp ' . number_format($sale->total_price + ($sale->total_price * $ppn->ppn / 100), 0, ',', '.') . '</h3>';
+        $html .= '<h3 class="try" data-all="' . ($sale->total_price + ($sale->total_price * $total / 100)) . '">Total: Rp ' . number_format($sale->total_price + ($sale->total_price * $total / 100), 0, ',', '.') . '</h3>';
 
         $detail = SaleDetail::where('sale_id', $sale_id)->first();
         if ($detail->status == 'confirm' or $detail->status == 'waiting' or $saleDetail->status == 'finish') {
             $html .= '
-            <div class="card-body">
+            <div class="card-bod">
             <div class="panel">
                 <div class="row">
                     <td>Payment Method <br>
-                    <div class="form-control">
-                        <span class="radio-item">
+                    <div class="form-control sizePayment">
+                        <span class="radio-item ">
                             <input type="radio" name="payment_type" class="true" value="cash" checked="checked">
                             <label for="payment_type"> <i class="fa fa-money-bill text-success"></i> Cash</label>
 
                             <input type="radio" name="payment_type" class="true" value="bank transfer">
                             <label for="payment_type"> <i class="fa fa-university text-danger"></i> Bank Transfer</label>
 
-                            <input type="radio" name="payment_type" class="true" value="credit Card">
-                            <label for="payment_type"> <i class="fa fa-credit-card text-info"></i> Credit Card</label>
+                            <input type="radio" name="payment_type" class="true" value="payment Card">
+                            <label for="payment_type"> <i class="fa fa-credit-card text-info"></i> Payment Card</label>
                         </span>
                     </div>
                     </td><br>
@@ -297,9 +324,9 @@ class CashierController extends Controller
         </div>
             ';
             if ($saleDetail->status == "NoConfirm") {
-                $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-success btn-block btn-payment" disabled>Payment</button>';
+                $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-block btn-payment mt-2" style="background-color: #ff7b54" disabled>Payment</button>';
             } else {
-                $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-success btn-block btn-payment">Payment</button>';
+                $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-block btn-payment mt-2" style="background-color: #ff7b54">Payment</button>';
             }
         } else {
             $html .= '
@@ -316,10 +343,8 @@ class CashierController extends Controller
                         </tr>
                     </table>
                 ';
-            $html .= '<button data-id="' . $sale_id . '" class="btn btn-warning btn-block btn-confirm-order">Confirm Order</button>';
+            $html .= '<button data-id="' . $sale_id . '" class="btn btn-block btn-confirm-order" style="background-color: #ffab73">Confirm Order</button>';
         }
-
-        // $showBtnPayment = false;
         // $saleDetails = SaleDetail::where('sale_id', $sale_id)->where(['status' => 'confirm']);
         return $html;
     }
@@ -352,12 +377,26 @@ class CashierController extends Controller
         $sale->customer_phone = $string;
 
         $sale->save();
+        $table = Table::find($sale->table_id);
+        $table->status = 'unvailable';
+        $table->save();
+        $tables = Table::where('status', 'available')->get();
         $saleDetails = SaleDetail::where('sale_id', $sale_id)->update(['status' => 'confirm']);
         // $saleDetails = SaleDetail::where('sale_id', $sale_id)->where('status', 'confirm')->first();
-        // dd($saleDetails);
         $html = '';
-        $html = $this->getSaleDetails($sale_id);
+        $html .= $this->getSaleDetails($sale_id);
         return $html;
+    }
+
+    public function updateTable(Request $request)
+    {
+        // $request->validate([
+        //     'table_id' => 'required|numeric'
+        // ]);
+        $table_id = $request->table_id;
+        $sale = Table::find($table_id);
+        $sale->status = 'available';
+        $sale->save();
     }
 
     // public function increaseQuantity(Request $request)
@@ -416,14 +455,6 @@ class CashierController extends Controller
         } else {
             $html = $this->getSaleDetails($saleDetail->sale_id);
         }
-
-        $ter = $request->saleID;
-        $sal = Sale::find($ter);
-        if ($sal == null) {
-            $table = Table::find($sale->table_id);
-            $table->status = 'available';
-            $table->save();
-        }
         return $html;
     }
 
@@ -431,6 +462,18 @@ class CashierController extends Controller
     {
         $saleDetail = SaleDetail::find($id);
         return view('cashier.note')->with('saleDetail', $saleDetail);
+    }
+
+    public function mejaPindah(Request $request)
+    {
+        $table_id = $request->table_id;
+        $sale_id = $request->sale_id;
+        $sales = Sale::find($sale_id);
+        $sales->table_id = $table_id;
+        $sales->save();
+        $table = Table::find($sales->table_id);
+        $table->status = 'unvailable';
+        $table->save();
     }
 
     public function requestNotes(Request $request)
@@ -460,18 +503,17 @@ class CashierController extends Controller
         $saleID = $request->saleID;
         $receiveTotal = $request->receiveTotal;
         $paymentType = $request->paymentType;
-        $ppn = Ppn::all();
-        foreach ($ppn as $ppn) {
-            $ppn->ppn;
-        }
-        // update sale information in the sales table by using sale model
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        $total = $ppn->sum('ppn');
         $sale = Sale::find($saleID);
         $sale->total_received = $receiveTotal;
-        $sale->change = ($receiveTotal - $sale->total_price) - ($sale->total_price * ($ppn->ppn / 100));
+        $sale->change = ($receiveTotal - $sale->total_price) - ($sale->total_price * ($total / 100));
         $sale->payment_type = $paymentType;
         $sale->sale_status = 'paid';
-        $sale->total_vat = $ppn->ppn;
-        $sale->total_vatprice = ($sale->total_price + ($sale->total_price * $ppn->ppn / 100));
+        $sale->total_vat = $total;
+        $sale->total_vatprice = ($sale->total_price + ($sale->total_price * $total / 100));
         $current = new Carbon;
         $current->timezone('GMT+7');
         $sale->created_at = $current;
@@ -495,16 +537,34 @@ class CashierController extends Controller
     {
         $sale = Sale::find($saleID);
         $saleDetails = SaleDetail::where('sale_id', $saleID)->get();
-        $ppn = Ppn::all();
-        return view('cashier.showReceipt', ['sale' => $sale, 'saleDetails' => $saleDetails, 'ppn' => $ppn]);
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        $total = $ppn->sum('ppn');
+        return view('cashier.showReceipt', ['sale' => $sale, 'saleDetails' => $saleDetails, 'total' => $total]);
     }
 
-    public function jsonReceipt(Request $request, $saleID)
+    // public function pdfDonwload($saleID)
+    // {
+    //     $sale = Sale::find($saleID);
+    //     $saleDetails = SaleDetail::where('sale_id', $saleID)->get();
+    //     $ppn = Ppn::select([
+    //         DB::raw("SUM(ppn) as ppn")
+    //     ])->groupBy('ppn')->orderBy('ppn')->first();
+    //     $total = $ppn->sum('ppn');
+    //     return view('pdf', ['sale' => $sale, 'saleDetails' => $saleDetails, 'total' => $total]);
+    // }
+
+    public function pdf($saleID)
     {
         $sale = Sale::find($saleID);
         $saleDetails = SaleDetail::where('sale_id', $saleID)->get();
-        $ppn = Ppn::all();
-        // dd($saleDetails);
-        return response()->json($saleDetails);
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        $total = $ppn->sum('ppn');
+        // $data['judul'] = 'The Propesors Caffe';
+        $pdf = \PDF::loadView('pdf', ['sale' => $sale, 'saleDetails' => $saleDetails, 'total' => $total]);
+        return $pdf->download('invoice.pdf');
     }
 }

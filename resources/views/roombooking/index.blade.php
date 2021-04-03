@@ -40,13 +40,13 @@
             serverSide: true,
             ajax: "{{ route('roombooking.data') }}",
             columns: [
-                {data: 'DT_RowIndex', name: 'id', width: '10%'},
-                {data: 'table_id', name: 'table_id', width: '10%'},
-                {data: 'date', name: 'date', width: '15%'},
-                {data: 'start', name: 'start', width: '15%'},
-                {data: 'end', name: 'end', width: '15%'},
-                {data: 'price', name: 'price', width: '15%'},
-                {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+                {data: 'DT_RowIndex', name: 'id'},
+                {data: 'table_id', name: 'table_id'},
+                {data: 'date', name: 'date'},
+                {data: 'start', name: 'start'},
+                {data: 'end', name: 'end'},
+                {data: 'price', name: 'price'},
+                {data: 'action', name: 'action', orderable: false, searchable: false, width : '30%'}
             ]
         });
 

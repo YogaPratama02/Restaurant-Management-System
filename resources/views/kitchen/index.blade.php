@@ -19,21 +19,6 @@
 
 @push('after-script')
 <script type="text/javascript">
-    // $(function() {
-    //     startRefresh();
-    // });
-
-    // function startRefresh() {
-    //     setTimeout(startRefresh,10000);
-    //     $.get('/kitchen', function(data) {
-    //         $('.lama').html(data);
-    //     });
-    // }
-    // sessionStorage.setItem('occupation', 'anjing lah susah');
-    // console.log(sessionStorage.getItem('occupation'));
-    // $('body').on('click', '#cepet', function(){
-    //        alert('haha')
-    // });
     $('body').on('click', '#ayo', function(data){
         $.ajax({
             url: '/kitchen/update/'+$(this).data('id'),

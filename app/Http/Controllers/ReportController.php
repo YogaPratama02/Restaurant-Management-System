@@ -11,6 +11,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Exports\SaleReportExport;
+use App\Exports\SaleDayExport;
 use Maatwebsite\Excel\Facades\Excel;
 use DataTables;
 
@@ -31,6 +32,9 @@ class ReportController extends Controller
             // $hmtl = array();
             $html['a'] = '';
             $html['day'] = '';
+            $html['cash'] = '';
+            $html['transfer'] = '';
+            $html['credit'] = '';
             $i = 0;
             foreach ($sale as $sale) {
                 $html['a'] .= '<tr>
@@ -42,7 +46,7 @@ class ReportController extends Controller
                 </tr>';
             }
             $cardz = Sale::select([
-                DB::raw("DATE_FORMAT(created_at, '%m') as month"),
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month"),
                 DB::raw("SUM(total_hpp) as total_hpp"),
                 DB::raw("SUM(total_price) as total_price"),
                 DB::raw("SUM(total_vatprice) as total_vatprice"),
@@ -56,8 +60,37 @@ class ReportController extends Controller
                         <td>' . 'Rp. ' . number_format($cardz->total_vatprice, 0, ',', '.') . '</td>
                     </tr>';
             }
+
+            $sale_cash = Sale::select([
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month"),
+                DB::raw("SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'cash')->groupBy('month')->orderBy('createdAt')->get();
+            foreach ($sale_cash as $sale) {
+                $html['cash'] .= 'Rp. ' . number_format($sale->total_vatprice, 0, ',', '.');
+            }
+
+            $saleBank = Sale::select([
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month"),
+                DB::raw("SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'bank transfer')->groupBy('month')->orderBy('createdAt')->get();
+
+            foreach ($saleBank as $saleBank) {
+                $html['transfer'] .= 'Rp. ' . number_format($saleBank->total_vatprice, 0, ',', '.');
+            }
+
+            $saleCard = Sale::select([
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month"),
+                DB::raw("SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'payment Card')->groupBy('month')->orderBy('createdAt')->get();
+
+            foreach ($saleCard as $saleCard) {
+                $html['credit'] .= 'Rp. ' . number_format($saleCard->total_vatprice, 0, ',', '.');
+            }
+
             return json_encode($html);
-            // dd($sale);
         }
 
         return view('report.index');
@@ -69,11 +102,14 @@ class ReportController extends Controller
             $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
             $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
             $html = '';
-            $sale_detail = SaleDetail::select(DB::raw('count(menu_name) as count, menu_name'))->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_name')->get();
+            $i = 0;
+            // $sale_detail = SaleDetail::select(DB::raw('count(menu_id) as count, menu_id'))->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_id')->get();
+            $sale_detail = DB::table('sale_details')->selectRaw('menu_name, SUM(quantity) as count')->groupBy('menu_name')->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_name')->get();
             foreach ($sale_detail as $sale_detail) {
                 $html .= '<tr>
+                    <td>' . ++$i . '</td>
                     <td>' . $sale_detail->menu_name . '</td>
-                    <td>' . $sale_detail->count . '</td>
+                    <td>' . $sale_detail->count  . '</td>
                 </tr>';
             }
             return json_encode($html);
@@ -91,16 +127,21 @@ class ReportController extends Controller
     {
         $date_start = $request->date_start;
         $date_end = $request->date_end;
-        dd($request->date_start);
+        // dd($date_end);
+        // dd($request->date_start);
         return Excel::download(new SaleReportExport($date_start, $date_end), 'saleReport.xlsx');
+    }
+
+    public function dayExcel(Request $request)
+    {
+        $date_start = $request->date_start;
+        $date_end = $request->date_end;
+        // dd($date_start);
+        return Excel::download(new SaleDayExport($date_start, $date_end), 'saleReport.xlsx');
     }
 
     public function month(Request $request)
     {
-        // $products = Sale::select(DB::raw('count(created_at) as created_at, created_at'))->groupBy('created_at')->get();
-        // $products = Sale::select('id', 'created_at')->get()->groupBy(function ($val) {
-        //     return Carbon::parse($val->created_at)->format('F');
-        // });
         if ($request->ajax()) {
             $date_start = date("Y-m-d", strtotime($request->date_start));
             $date_end = date("Y-m-d", strtotime($request->date_end));
@@ -117,6 +158,7 @@ class ReportController extends Controller
             $html['tal'] = '';
             $html['cash'] = '';
             $html['bank'] = '';
+            $html['card'] = '';
             $html['menu'] = '';
             $i = 0;
             $j = 0;
@@ -124,9 +166,9 @@ class ReportController extends Controller
                 $html['menuz'] .= '<tr>
                     <td>' . ++$i . '</td>
                     <td>' . date("M Y", strtotime($cards->month)) . '</td>
-                    <td>' . 'Rp. ' . number_format($cards->total_hpp, 2, ',', '.') . '</td>
-                    <td>' . 'Rp. ' . number_format($cards->total_price, 2, ',', '.') . '</td>
-                    <td>' . 'Rp. ' . number_format($cards->total_vatprice, 2, ',', '.') . '</td>
+                    <td>' . 'Rp. ' . number_format($cards->total_hpp, 0, ',', '.') . '</td>
+                    <td>' . 'Rp. ' . number_format($cards->total_price, 0, ',', '.') . '</td>
+                    <td>' . 'Rp. ' . number_format($cards->total_vatprice, 0, ',', '.') . '</td>
                 </tr>';
             }
 
@@ -142,7 +184,7 @@ class ReportController extends Controller
                 $html['tal'] .=  '
                     <tr>
                         <th id="total" colspan="4">Total</th>
-                        <td>' . 'Rp. ' . number_format($card->total_vatprice, 2, ',', '.') . '</td>
+                        <td>' . 'Rp. ' . number_format($card->total_vatprice, 0, ',', '.') . '</td>
                     </tr>';
             }
 
@@ -152,8 +194,7 @@ class ReportController extends Controller
                 DB::raw('max(created_at) as createdAt')
             ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'cash')->groupBy('month')->orderBy('createdAt')->get();
             foreach ($sale_payment as $sale) {
-                $html['cash'] .= '
-                    <h4>Total Cash : <span>' . 'Rp. ' . number_format($sale->total_vatprice, 2, ',', '.') . '</span> </h4>';
+                $html['cash'] .= 'Rp. ' . number_format($sale->total_vatprice, 0, ',', '.');
             }
 
             $salez = Sale::select([
@@ -163,11 +204,21 @@ class ReportController extends Controller
             ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'bank transfer')->groupBy('month')->orderBy('createdAt')->get();
 
             foreach ($salez as $salez) {
-                $html['bank'] .= '
-                    <h4>Total Transfer Bank : <span>' . 'Rp. ' . number_format($salez->total_vatprice, 2, ',', '.') . '</span> </h4>';
+                $html['bank'] .= 'Rp. ' . number_format($salez->total_vatprice, 0, ',', '.');
             }
 
-            $saleDetail = SaleDetail::select(DB::raw('count(menu_name) as count, menu_name'))->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_name')->get();
+            $saleCard = Sale::select([
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month"),
+                DB::raw("SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'payment Card')->groupBy('month')->orderBy('createdAt')->get();
+
+            foreach ($saleCard as $saleCard) {
+                $html['card'] .= 'Rp. ' . number_format($saleCard->total_vatprice, 0, ',', '.');
+            }
+
+            // $saleDetail = SaleDetail::select(DB::raw('count(menu_name) as count, menu_name'))->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_name')->get();
+            $saleDetail = DB::table('sale_details')->selectRaw('menu_name, SUM(quantity) as count')->groupBy('menu_name')->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_name')->get();
             foreach ($saleDetail as $saleDetail) {
                 $html['menu'] .= '
                         <tr>
@@ -196,7 +247,6 @@ class ReportController extends Controller
         $formatted_array = array_map(function ($num) {
             return number_format($num, 2, ',', '.');
         }, $data);
-        // dd($formatted_array);
 
         return view('report.indexmonth', ['month' => json_encode($bulan), 'data' => json_encode($data)]);
     }
@@ -228,30 +278,50 @@ class ReportController extends Controller
     public function purchase(Request $request)
     {
         if ($request->ajax()) {
-            $date_start = date("Y-m-d H:i:s", strtotime($request->date_start . ' 00:00:00'));
-            $date_end = date("Y-m-d H:i:s", strtotime($request->date_end . ' 23:59:59'));
-            $purchase = Supplier::whereBetween('updated_at', [$date_start, $date_end]);
-            return DataTables()->of($purchase)
-                ->editColumn('date', function ($purchase) {
-                    $date = date('d M Y', strtotime($purchase->date));
-                    return $date;
-                })
-                ->addColumn('updated_at', function ($purchase) {
-                    $input = date('d M Y', strtotime($purchase->updated_at));
-                    return $input;
-                })
-                ->addColumn('name', function ($purchase) {
-                    $name = $purchase->name;
-                    return $name;
-                })
-                ->addColumn('total', function ($purchase) {
-                    $total = 'Rp. ';
-                    $total .= number_format($purchase->total, 0, ',', '.');
-                    return $total;
-                })
-                ->addIndexColumn()
-                ->rawColumns(['date', 'name', 'total', 'updated_at'])
-                ->make(true);
+            $date_start = date("Y-m-d", strtotime($request->date_start));
+            $date_end = date("Y-m-d", strtotime($request->date_end));
+            $html['total'] = '';
+            $html['footer'] = '';
+            $html['detail'] = '';
+            $i = 0;
+            $j = 0;
+            $purchase = Supplier::select([
+                DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+                DB::raw("SUM(total) as total"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->orderBy('createdAt')->get();
+            // $purchase = Supplier::whereBetween('updated_at', [$date_start, $date_end])->get();
+            foreach ($purchase as $purchase) {
+                $html['total'] .= '<tr>
+                    <td>' . ++$i . '</td>
+                    <td>' . $purchase->month . '</td>
+                    <td>' . 'Rp. ' .  number_format($purchase->total, 0, ',', '.') . '</td>
+                </tr>';
+            }
+
+            $purc = Supplier::select([
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month"),
+                DB::raw("SUM(total) as total"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->orderBy('createdAt')->get();
+
+            foreach ($purc as $purc) {
+                $html['footer'] = '<tr>
+                        <th id="total" colspan="2">Total</th>
+                        <td>' . 'Rp. ' . number_format($purc->total, 0, ',', '.') . '</td>
+                    </tr>';
+            }
+
+            $detail = Supplier::select(DB::raw('count(name) as count, name'))->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('name')->get();
+
+            foreach ($detail as $detail) {
+                $html['detail'] .= '<tr>
+                    <td>' . ++$j . '</td>
+                    <td>' . $detail->name . '</td>
+                    <td>' . $detail->count . '</td>
+                </tr>';
+            }
+            return json_encode($html);
         }
         return view('report.purchase');
     }

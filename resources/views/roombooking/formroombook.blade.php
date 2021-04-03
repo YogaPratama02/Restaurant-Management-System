@@ -13,7 +13,6 @@
     <div class="form-group">
         <label for="" class="control-label">Date</label>
         {!! Form::date('date', null, ['class' => 'form-control', 'id' => 'date', 'placeholder="Date.."']) !!}
-        {{-- {!! Form::date('start', null, ['class' => 'form-control', 'id' => 'start', 'placeholder="Start.."']) !!} --}}
     </div>
     <div class="form-group">
         <label for="" class="control-label">Start</label>
@@ -23,7 +22,6 @@
     <div class="form-group">
         <label for="" class="control-label">End</label>
         {!! Form::time('end', null, ['class' => 'form-control', 'id' => 'end', 'placeholder="End.."']) !!}
-        {{-- {!! Form::date('end', null, ['class' => 'form-control', 'id' => 'end', 'placeholder="End.."']) !!} --}}
     </div>
     <div class="form-group">
         <label for="" class="control-label">Price</label>

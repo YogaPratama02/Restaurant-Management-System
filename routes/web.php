@@ -4,6 +4,7 @@ use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use Carbon\Carbon;
 use App\SaleDetail;
+use Facade\FlareClient\Http\Response;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,6 +17,15 @@ use App\SaleDetail;
 |
 */
 
+Route::get(
+    '/yoga',
+    function () {
+        return response()->json([
+            "name" => "{<span>tag_name_nolink</span>}",
+            "content" => "{<span>tag_description</span>}",
+        ]);
+    }
+);
 Route::get('/', 'HomeController@show');
 
 Auth::routes(['register' => true, 'reset' => false]);
@@ -34,9 +44,13 @@ Route::group(['middleware' => ['role:cashier|super admin|admin']], function () {
     Route::post('/cashier/decrease-quantity', 'CashierController@decreaseQuantity');
     Route::get('/cashier/note/{id}', 'CashierController@notes')->name('cashier.note');
     Route::post('/cashier/update', 'CashierController@requestNotes')->name('cashier.update');
+    Route::post('/cashier/store/', 'CashierController@mejaPindah')->name('cashier.store');
+    Route::post('/cashier/updateTable', 'CashierController@updateTable')->name('cashier.updatetable');
+    Route::post('/cashier/mejaPindah', 'CashierController@mejaPindah');
     Route::post('/cashier/savePayment', 'CashierController@savePayment');
     Route::get('/cashier/showReceipt/{saleID}', 'CashierController@showReceipt');
-    Route::get('/cashier/jsonReceipt/{saleID}', 'CashierController@jsonReceipt');
+    Route::get('/cashier/pdf/{saleID}', 'CashierController@pdf');
+    // Route::get('/coba', 'CashierController@pdf')->name('cashier.print');
 
     //roombooking
     Route::get('/bookingroom', 'RoomBookingController@index')->name('roombooking.index');
@@ -155,4 +169,5 @@ Route::group(['middleware' => ['role:super admin']], function () {
 
     // export excel
     Route::get('/report/show/export', 'ReportController@reportExcel')->name('report.excel');
+    Route::get('/report/day/export', 'ReportController@dayExcel')->name('report.dayexcel');
 });

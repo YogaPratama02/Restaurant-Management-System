@@ -95,83 +95,45 @@
     cursor: pointer;
 }
 
-.cat{
-    background-color: green;
-}
-
-/* .uwaw{
-    display: flex;
-} */
-
-.catnam{
+/* .catnam{
     width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     background-color: tomato;
-}
+} */
 
 .flex-container {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     background-color: #ffd56b;
-    border-radius: 25px;
+    border-radius: 10px;
     cursor: pointer;
   }
 
   .flex-container > a {
     background-color: #ff7b54;
-    border-radius: 25px;
+    border-radius: 10px;
     width: 28%;
     margin: 8px;
     text-align: center;
     line-height: 26px;
     font-size: 16px;
-    /* font-family: "Nunito", sans-serif; */
-  }
-  /* .flex-menu {
-    display: flex;
-    flex-wrap: wrap;
-    border-radius: 25px;
-    cursor: pointer;
   }
 
-  .flex-menu div {
-    border-radius: 25px;
-    width: 28%;
-    margin: 8px;
-    text-align: center;
-    line-height: 26px;
-    font-size: 20px;
-  } */
-  /* .carousel-container{
-    width: 100%;
-    margin: auto;
-    margin-top: 10px;
-    display: flex;
-  }
-  .carousel-slide{
-    display: flex;
-    width: 100%;
-    height: 120px;
-  }
+@media only screen and (max-width: 900px) {
+    .flex-container > a {
+        background-color: #ff7b54;
+        border-radius: 10px;
+        width: 28%;
+        margin: 6px;
+        text-align: center;
+        line-height: 20px;
+        font-size: 15px;
+      }
 
-  .carousel-container .imgs{
-      float: left;
-      list-style-type: none;
-      width: 150px;
-      height: 120px;
-  } */
-
-
-/* .ytyt{
-    display: flex;
-    background-color: #aaa;
-} */
-
-@media only screen and (max-width: 768px) {
-    .ter {
-      height:20vh;
+    .sizePayment {
+        padding: 7px;
     }
   }

@@ -7,7 +7,6 @@
     <div class="form-group">
         <label for="" class="control-label">Date</label>
         {!! Form::date('date', null, ['class' => 'form-control', 'id' => 'date', 'placeholder="Date.."']) !!}
-        {{-- {!! Form::date('start', null, ['class' => 'form-control', 'id' => 'start', 'placeholder="Start.."']) !!} --}}
     </div>
     <div class="modal-body">
         <div class="form-group">

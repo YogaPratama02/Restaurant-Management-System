@@ -10,11 +10,12 @@
             <div class="col-md-5">
                 <button class="btn btn-block" id="btn-show-tables" style="background-color: #ffd384">View All Table</button>
                 <div class="select-table text-center"></div>
+                <div class="l text-center"></div>
             </div>
         </div>
         <div class="row mt-3">
             <div class="col-md-5">
-                <div class="flex-container text-white">
+                <div class="flex-container text-white justify-content-center">
                     @foreach ($categories as $category)
                     <a class="nav-link" data-id="{{$category->id}}">{{$category->name}}</a>
                     @endforeach
@@ -24,7 +25,6 @@
             <div class="col-md-7" id="order"></div>
             <div class="col-md-7" id="wrwr"></div>
         </div>
-
         {{-- <div class="row">
             <div class="col-md-12">
                 <div id="order"></div>
@@ -83,9 +83,7 @@
             });
             $(".nav-link").click(function(){
                 $.get("/cashier/getMenu/"+$(this).data("id"),function(data){
-                    // var a = toggle();
                     $('#list-menu').html(data);
-                    // console.log(a)
                 });
             });
             $(".nav-link").dblclick(function(){
@@ -107,11 +105,14 @@
             $('#table-detail').on('click', '.btn-table', function(){
                 table_id = $(this).data('id');
                 table_name = $(this).data('name');
-                $('.select-table').html('<br><h3>Table: '+table_name+'</h3><hr>');
+                id = $(this).data('id');
+                $('.select-table').html('<br><h3>Table: '+table_name+'</h3>');
                 $.get('/cashier/getSaleDetailsByTable/'+table_id, function(data){
-                    $('#order').html(data);
+                    $('#order').html(data.a);
+                    $('.l').html(data.b);
                 });
             });
+
             $('#list-menu').on('click', '.btn-menu', function(){
                 if(table_id == ""){
                     alert('pilih table terlebih dahulu');
@@ -123,7 +124,6 @@
                             '_token' :'{{ csrf_token() }}',
                             'menu_id': menu_id,
                             'table_id': table_id,
-                            'table_name': table_name,
                             'quantity': 1,
                             'menu_discount': menu_discount
                         },
@@ -182,6 +182,48 @@
                     }
                 });
             });
+            $('body').on('click', '.mejaUpdate', function(event){
+                event.preventDefault();
+                var table_id = $(this).data('id');
+                $.ajax({
+                    method: 'POST',
+                    data : {
+                        '_token' :'{{ csrf_token() }}',
+                        'table_id' : table_id,
+                    },
+                    url : '/cashier/updateTable',
+                    success : function(response){
+                        // $('#order').html(data);
+                        // alert('berhasil')
+                        console.log(table_id);
+                    },
+                    error : function(response){
+                        alert('gagal');
+
+                    }
+                });
+            });
+
+            $('.l').on('click', '.table_update', function(){
+                var sale_id = $(this).data('id');
+                var table_id = $('.riri').val();
+                $.ajax({
+                    method: 'POST',
+                    data : {
+                        '_token' :'{{ csrf_token() }}',
+                        'table_id' : table_id,
+                        'sale_id' : sale_id
+                    },
+                    url : '/cashier/mejaPindah',
+                    success : function(response){
+                        // $('#order').html(data);
+                        console.log(table_name);
+                    },
+                    error : function(response){
+                        alert('gagal');
+                    }
+                });
+            });
 
             $('#order').on('click', '.update_note', function(){
                 var SaleDe = $(this).data('id');
@@ -196,29 +238,13 @@
                     url: '/cashier/update/',
                     success: function(data){
                         $('#order').html(data);
+                        // console.log(saleDetail_id);
                     },
                     error: function(data){
                         alert('gagal');
                     }
                 })
             });
-
-            // increase quantity
-            // $('#order').on('click', '.btn-increase-quantity', function(){
-            //     var saleDetailID = $(this).data('id');
-            //     // var invent = $(this).data('menu_id');
-            //     $.ajax({
-            //         type: 'POST',
-            //         data: {
-            //             '_token' :'{{ csrf_token() }}',
-            //             'saleDetail_id': saleDetailID
-            //         },
-            //         url: '/cashier/increase-quantity',
-            //         success: function(data){
-            //             $('#order').html(data);
-            //         }
-            //     });
-            // });
 
             // decrease quantity
             $('#order').on('click', '.btn-decrease-quantity', function(){
@@ -258,7 +284,6 @@
             // }));
 
             $('#order').on('keyup', '#paid_amount', function(){
-                // var a = $(".btn-payment").attr('data-total');
                 var totalAmount = $(".try").attr('data-all');
                 // console.log(b);
                 var paid_amount = $(this).val();
@@ -303,23 +328,6 @@
                     }
                 })
             });
-
-            // $('.btn-save-payment').click(function(data){
-
-            //     $.ajax({
-            //         type: 'POST',
-            //         data: {
-            //             '_token' :'{{ csrf_token() }}',
-            //             'saleID': saleId,
-            //             'receiveTotal': receivedToal,
-            //             'paymentType': paymentType
-            //         },
-            //         url: '/cashier/savePayment',
-            //         success: function(data){
-            //             window.location.href=data
-            //         }
-            //     })
-            // });
         });
     </script>
 @endpush

@@ -10,11 +10,15 @@ class Table extends Model
         'name'
     ];
 
-    protected $hidden = [
+    protected $hidden = [];
 
-    ];
+    public function roombookings()
+    {
+        return $this->hasMany(RoomBooking::class);
+    }
 
-    public function roombookings(){
-        return $this->hasMany(RoomBooking::Class);
+    public function sale()
+    {
+        return $this->hasMany(Sale::class);
     }
 }

@@ -39,12 +39,12 @@
         serverSide: true,
         ajax: "{{ route('supplier.data') }}",
         columns: [
-            {data: 'DT_RowIndex', name: 'id', width: '10%'},
-            {data: 'date', name: 'date', width: '15%'},
-            {data: 'name', name: 'name', width: '15%'},
-            {data: 'total', name: 'total', width: '15%'},
-            {data: 'user_name', name: 'user_name', width: '15%'},
-            {data: 'action', name: 'action', orderable: false, searchable: false, width: '20%'}
+            {data: 'DT_RowIndex', name: 'id'},
+            {data: 'date', name: 'date'},
+            {data: 'name', name: 'name'},
+            {data: 'total', name: 'total'},
+            {data: 'user_name', name: 'user_name'},
+            {data: 'action', name: 'action', orderable: false, searchable: false, width: '30%'}
         ]
     });
 

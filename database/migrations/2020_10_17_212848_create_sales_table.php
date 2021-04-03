@@ -15,8 +15,7 @@ class CreateSalesTable extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('table_id');
-            $table->string('table_name');
+            $table->bigInteger('table_id')->unsigned();
             $table->bigInteger('user_id')->unsigned();
             $table->string('user_name');
             $table->string('customer_name')->default("");
@@ -30,6 +29,7 @@ class CreateSalesTable extends Migration
             $table->string('payment_type')->default("");
             $table->string('sale_status')->default("unpaid");
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('table_id')->references('id')->on('tables')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }
