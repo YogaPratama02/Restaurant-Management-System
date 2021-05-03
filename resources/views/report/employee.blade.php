@@ -4,31 +4,23 @@
     <div class="container">
         <div class="card-body">
             <div class="row">
-                <div class="col-md-4 form-group input-daterange">
+                <div class="col-md-4 col-sm-4 col-lg-4 col-6 form-group input-daterange">
                     <input type="text" name="date_start" id="date_start" class="form-control text-center" placeholder="from date.." readonly />
                 </div>
-                <div class="col-md-4 form-group">
+                <div class="col-md-4 col-sm-4 col-lg-4 col-6 form-group">
                     <input type="text" name="date_end" id="date_end" class="form-control text-center" placeholder="end date.." readonly />
                 </div>
-                <div class="col-md-4">
-                    <button type="button" name="filter" id="filter" class="btn text-white" style="background-color: #295192">Filter</button>
-                    <button type="button" name="refresh" id="refresh" class="btn text-white" style="background-color: #295192">Refresh</button>
+                <div class="col-md-4 col-sm-4 col-lg-4 col-6">
+                    <button type="button" name="filter" id="filter" class="btn text-black" style="background-color: #90be6d">Filter</button>
+                    <button type="button" name="refresh" id="refresh" class="btn text-black" style="background-color: #90be6d">Refresh</button>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <div class="card-body">
-                        <table id="employee" class="table table-bordered text-center" style="width:100%">
-                            <thead class="text-white" style="background-color:#295192">
-                                <tr class="text-lite text-center">
-                                    <th scope="col">Employee</th>
-                                    <th scope="col">Total Transactions </th>
-                                </tr>
-                            </thead>
-                            <tbody id="result">
-
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table id="employee" class="table hover" style="width:100%"></table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -52,22 +44,23 @@ $(document).ready(function(){
         {
             $("#date_end").datepicker('update', new Date(e.date.getFullYear(), e.date.getMonth() + 1, 0));
         });
+
     load_data();
     function load_data(date_start = '', date_end = '')
     {
-        $.ajax({
-            url: "{{route('report.employee')}}",
-            type: "GET",
-            dataType:"json",
-            data: {date_start: date_start, date_end:date_end},
-            success: function(data)
-            {
-                $('#result').html(data);
+        var employee = $('#employee').DataTable({
+            responsive: true,
+            serverSide: true,
+            ajax: {
+                url : "{{ route('report.employeeData') }}",
+                type: "GET",
+                data: {date_start: date_start, date_end:date_end}
             },
-            error: function(data)
-            {
-                alert('not responding');
-            }
+            columns: [
+                {title: 'No', data: 'DT_RowIndex', name: 'DT_RowIndex', orderable:false, className: 'dt-center'},
+                {title: 'Employee Name', data: 'employee_name', name: 'employee_name', className: 'dt-center'},
+                {title: 'Total transaction', data: 'count', name: 'count', className: 'dt-center'}
+            ],
         });
     }
 
@@ -75,6 +68,7 @@ $(document).ready(function(){
         var date_start = $('#date_start').val();
         var date_end = $('#date_end').val();
         if(date_start != '' && date_end != ''){
+            $('#employee').DataTable().destroy();
             load_data(date_start, date_end);
         }else{
             alert('Both date is required');
@@ -84,6 +78,7 @@ $(document).ready(function(){
     $('#refresh').click(function(){
         $('#date_start').val('');
         $('#date_end').val('');
+        $('#employee').DataTable().destroy();
         load_data();
     });
 });

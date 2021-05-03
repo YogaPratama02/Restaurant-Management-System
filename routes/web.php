@@ -1,8 +1,6 @@
 <?php
 
-use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
-use Carbon\Carbon;
 use App\SaleDetail;
 use Facade\FlareClient\Http\Response;
 
@@ -17,21 +15,14 @@ use Facade\FlareClient\Http\Response;
 |
 */
 
-Route::get(
-    '/yoga',
-    function () {
-        return response()->json([
-            "name" => "{<span>tag_name_nolink</span>}",
-            "content" => "{<span>tag_description</span>}",
-        ]);
-    }
-);
 Route::get('/', 'HomeController@show');
 
-Auth::routes(['register' => true, 'reset' => false]);
+Auth::routes(['register' => true, 'verify' => true]);
+
+// Route::get()
 
 // Route::get('/home', 'HomeController@index')->name('dashboard');
-Route::group(['middleware' => ['role:cashier|super admin|admin']], function () {
+Route::group(['middleware' => ['role:members|cashier|super admin|admin', 'verified']], function () {
     // Cashier
     Route::get('/cashier', 'CashierController@index')->name('cashier.index');
     Route::get('/cashier/getTable', 'CashierController@getTables');
@@ -40,17 +31,19 @@ Route::group(['middleware' => ['role:cashier|super admin|admin']], function () {
     Route::get('/cashier/getSaleDetailsByTable/{table_id}', 'CashierController@getSaleDetailsByTable');
     Route::post('/cashier/confirmOrder', 'CashierController@confirmOrder');
     Route::post('/cashier/confirmAgain', 'CashierController@confirmAgain');
-    // Route::post('/cashier/increase-quantity', 'CashierController@increaseQuantity');
     Route::post('/cashier/decrease-quantity', 'CashierController@decreaseQuantity');
     Route::get('/cashier/note/{id}', 'CashierController@notes')->name('cashier.note');
     Route::post('/cashier/update', 'CashierController@requestNotes')->name('cashier.update');
     Route::post('/cashier/store/', 'CashierController@mejaPindah')->name('cashier.store');
     Route::post('/cashier/updateTable', 'CashierController@updateTable')->name('cashier.updatetable');
+    Route::post('/cashier/voucher', 'CashierController@voucher');
     Route::post('/cashier/mejaPindah', 'CashierController@mejaPindah');
+});
+Route::group(['middleware' => ['role:cashier|super admin|admin', 'verified']], function () {
+    // Cashier
     Route::post('/cashier/savePayment', 'CashierController@savePayment');
     Route::get('/cashier/showReceipt/{saleID}', 'CashierController@showReceipt');
     Route::get('/cashier/pdf/{saleID}', 'CashierController@pdf');
-    // Route::get('/coba', 'CashierController@pdf')->name('cashier.print');
 
     //roombooking
     Route::get('/bookingroom', 'RoomBookingController@index')->name('roombooking.index');
@@ -65,7 +58,6 @@ Route::group(['middleware' => ['role:cashier|super admin|admin']], function () {
     Route::get('/kitchen', 'KitchenController@index')->name('kitchen.index');
     Route::get('/kitchen/update/{id}', function ($id) {
         $saledetail = SaleDetail::find($id);
-        // dd($saledetail);
         $saledetail->status = 'waiting';
         $saledetail->save();
     });
@@ -77,7 +69,7 @@ Route::group(['middleware' => ['role:cashier|super admin|admin']], function () {
     });
 });
 
-Route::group(['middleware' => ['role:super admin|admin']], function () {
+Route::group(['middleware' => ['role:super admin|admin', 'verified']], function () {
     Route::get('/management', function () {
         return view('pages.management.index');
     });
@@ -148,26 +140,45 @@ Route::group(['middleware' => ['role:super admin|admin']], function () {
     Route::put('/inventory/update/{id}', 'InventoryController@update')->name('inventory.update');
     Route::delete('/inventory/delete/{id}', 'InventoryController@destroy')->name('inventory.destroy');
     Route::get('/inventoryReport', 'InventoryController@reportInventory')->name('inventory.report');
+
+    // voucher
+    Route::get('/voucher', 'VoucherController@index')->name('voucher.index');
+    Route::get('/voucher/create', 'VoucherController@create')->name('voucher.create');
+    Route::get('/voucher/data', 'VoucherController@dataTable')->name('voucher.data');
+    Route::post('/voucher/store', 'VoucherController@store')->name('voucher.store');
+    Route::get('/voucher/edit/{id}', 'VoucherController@edit')->name('voucher.edit');
+    Route::put('/voucher/update/{id}', 'VoucherController@update')->name('voucher.update');
+    Route::delete('/voucher/delete/{id}', 'VoucherController@destroy')->name('voucher.destroy');
 });
 
-Route::group(['middleware' => ['role:super admin']], function () {
+Route::group(['middleware' => ['role:super admin', 'verified']], function () {
     // report
     Route::get('/report', 'ReportController@index')->name('report.index');
     Route::get('/report/show', 'ReportController@show')->name('report.showReport');
     Route::get('/report/dataTable', 'ReportController@dataTable')->name('report.dataTable');
-    Route::get('/report/detail/{id}', 'ReportController@detail')->name('report.detail');
-    Route::get('/report/resume', 'ReportController@resume')->name('report.resume');
-    Route::get('/month', 'ReportController@month')->name('report.month');
+    Route::get('/report/dataDaily', 'ReportController@dataDaily')->name('report.dataDaily');
+    Route::get('/report/typeDaily', 'ReportController@typeDaily')->name('report.typeDaily');
+    Route::get('/report/resume', 'ReportController@resumeDaily')->name('report.resumeDaily');
+    Route::get('/report/month', 'ReportController@month')->name('report.indexmonth');
+    Route::get('/report/datamonth', 'ReportController@dataMonth')->name('report.dataMonth');
+    Route::get('/report/menumonth', 'ReportController@menuMonth')->name('report.menuMonth');
     Route::get('/month/chart', 'ReportController@month')->name('report.chart');
-    Route::get('/employee', 'ReportController@employee')->name('report.employee');
+
+    // report employe
+    Route::get('/employee', 'ReportController@indexEmployee')->name('report.employee');
+    Route::get('/employee/data', 'ReportController@employee')->name('report.employeeData');
 
     // report purchase
-    Route::get('/purchase', 'ReportController@purchase')->name('purchase.index');
-    Route::get('/totalpurchase', 'ReportController@purchaseTotal')->name('purchase.total');
-
-    // Route::get('/report/charts', 'ReportController@charts')->name('report.showReportCharts');
+    Route::get('/report/purchase', 'ReportController@indexPurchase')->name('purchase.index');
+    Route::get('report/datapurchase', 'ReportController@purchase')->name('purchase.data');
 
     // export excel
     Route::get('/report/show/export', 'ReportController@reportExcel')->name('report.excel');
     Route::get('/report/day/export', 'ReportController@dayExcel')->name('report.dayexcel');
+
+    // customer report
+    Route::get('/customer', 'ReportController@customers')->name('customer.index');
+
+    // member report
+    Route::get('/member', 'ReportController@member')->name('member.index');
 });

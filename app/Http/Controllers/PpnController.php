@@ -10,7 +10,6 @@ class PpnController extends Controller
 {
     public function index()
     {
-        $ppn = Ppn::all();
         return view('ppn.index');
     }
 
@@ -73,9 +72,6 @@ class PpnController extends Controller
                 ]);
             })
             ->addColumn('ppn', function ($ppn) {
-                // $ppns = '';
-                // $ppns .= number_format($ppn->ppn, ',', '.', 0);
-                // return "$ppns %";
                 return "$ppn->ppn %";
             })
             ->addIndexColumn()

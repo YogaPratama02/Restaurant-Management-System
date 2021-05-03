@@ -5,10 +5,10 @@
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mt-3">
-                    <div class="card-header" style="background-color:#295192">
+                    <div class="card-header" style="background-color:#90be6d">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> Purchase
                         </h5>
-                        <a href="{{ route('supplier.create') }}" class="btn btn-success btn-sm float-right modal-show text-white" title="Create Menu"><i class="fas fa-plus"></i> Create Purchase</a>
+                        <a href="{{ route('supplier.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#577590" title="Create Purchase"><i class="fas fa-plus"></i> Create Purchase</a>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered" style="width:100%">
@@ -43,7 +43,7 @@
             {data: 'date', name: 'date'},
             {data: 'name', name: 'name'},
             {data: 'total', name: 'total'},
-            {data: 'user_name', name: 'user_name'},
+            {data: 'user.name', name: 'user.name'},
             {data: 'action', name: 'action', orderable: false, searchable: false, width: '30%'}
         ]
     });

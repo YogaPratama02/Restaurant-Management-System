@@ -60,8 +60,6 @@
     margin: auto;
 }
 
-
-
 /* checked after style */
 .radio-item input[type="radio"]:checked:after{
     position: relative;
@@ -95,42 +93,202 @@
     cursor: pointer;
 }
 
-/* .catnam{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: tomato;
-} */
-
 .flex-container {
     display: flex;
     align-items: center;
+    justify-content: start;
     flex-wrap: wrap;
-    background-color: #ffd56b;
+    background-color: #90be6d;
     border-radius: 10px;
     cursor: pointer;
-  }
+}
 
-  .flex-container > a {
-    background-color: #ff7b54;
+.flex-container > a {
+    background-color: #ffd384;
     border-radius: 10px;
-    width: 28%;
+    width: 28%px;
+    height: 50px;
     margin: 8px;
     text-align: center;
-    line-height: 26px;
-    font-size: 16px;
+    flex: 0 1 122px;
+    word-wrap: break-word;
+}
+
+.voucher {
+    background-color: #ffd384;
+    border-radius: 10px;
+    width: 15%;
+}
+
+  /* .berhasil{
+      font-size: 0;
+      width: 35px;
+      height: 35px;
+      background-color: white;
+      border-radius: 50%;
+      border-inline-color: #ffd384;
+      border-left-color: transparent;
+      animation: rotate 1.4s ease 0.5s infinite;
+  } */
+  /* @keyframes rotate {
+      0%{
+          transform: rotate(360deg);
+      }
+  } */
+
+  /* .success{
+      position: relative;
+      background-color: white;
+      animation: bounce .3s ease-in;
   }
+  @keyframes bounce{
+      0%{
+          transform: scale(0.9);
+      }
+  } */
+  /* .success:before{
+      content: '';
+      position: absolute;
+      background: url('/images/check-solid.svg') no-repeat;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      width: 25px;
+      height: 25px;
+      line-height: 25px;
+      top: 5px;
+  } */
+
+.select-table{
+    color: white;
+}
+.scroll{
+    /* border: 1px solid black; */
+    margin-top: 10px;
+    height: 400px;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.scroll::-webkit-scrollbar{
+    width: 12px;
+    background-color: #ddd;
+}
+
+.scroll::-webkit-scrollbar-thumb{
+    background-color: #ffd384;
+    border-radius: 6px;
+}
+
+.get_menu{
+    overflow-y: auto;
+    height: 370px;
+}
+
+.get_menu::-webkit-scrollbar{
+    width: 10px;
+    background-color: #ddd;
+}
+
+.get_menu::-webkit-scrollbar-thumb{
+    background-color: #ffd384;
+    border-radius: 6px;
+}
+
+.nav-wrap{
+    cursor: pointer;
+
+}
+
+.show_menu{
+    background-color: #ffd384;
+}
+.img_sold{
+    position: relative;
+    width: 100%;
+}
+.img_sold img{
+    width: 100%;
+}
+.text_sold{
+    font-size: 20px;
+    position: absolute;
+    top: 40%;
+    width: 100%;
+    text-align: center;
+}
+
+.text_menu{
+    font-size: 15px;
+}
+
+.refresh{
+    background-color: #ffd384;
+}
+
+.img_menu_show{
+    height:135px;
+    width:100%;
+}
+
+.show_menus{
+    height: 210px;
+    width: 190px;
+}
+
+@media only screen and (max-width: 575px){
+    .nav-wrap{
+        margin-top: 20px;
+    }
+}
+
+@media only screen and (max-width: 405px){
+    .text_menu{
+        font-size: 14px;
+    }
+    .show_menus{
+        width: 180px;
+    }
+}
+@media only screen and (max-width: 385px){
+    .text_menu{
+        font-size: 12px;
+    }
+    .show_menus{
+        width: 160px;
+    }
+    .img_menu_show{
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    /* .nav-tabs{
+        display: flex;
+        flex-wrap: wrap;
+        background-color: DodgerBlue;
+        width: 100%;
+    } */
+
+    /* .nav-tabs > a {
+        background-color: #ffd384;
+        width: 20%;
+        text-align: center;
+    } */
+    .nav-wrap{
+        margin-top: 20px;
+    }
+}
 
 @media only screen and (max-width: 900px) {
     .flex-container > a {
-        background-color: #ff7b54;
+        background-color: #ffd384;
         border-radius: 10px;
         width: 28%;
         margin: 6px;
         text-align: center;
-        line-height: 20px;
-        font-size: 15px;
+        flex: 0 1 122px;
+        word-wrap: break-word;
       }
 
     .sizePayment {

@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Inventory;
-use App\InventoryMenu;
 use Carbon\Carbon;
 use DataTables;
 use Illuminate\Support\Facades\DB;
@@ -44,11 +43,6 @@ class InventoryController extends Controller
         $inventories->save();
     }
 
-    public function show($id)
-    {
-        //
-    }
-
     public function edit($id)
     {
         $inventories = Inventory::findOrFail($id);
@@ -84,7 +78,6 @@ class InventoryController extends Controller
     public function dataTable()
     {
         $inventories = Inventory::all();
-        // dd($inventories->menus()->name);
         return DataTables()->of($inventories)
             ->addColumn('action', function ($inventories) {
                 return view('inventory.inventoryaction', [
@@ -110,9 +103,6 @@ class InventoryController extends Controller
                 $alert_quantity .= number_format($inventories->alert_quantity, 0, ',', '.');
                 return '<span class="text-danger">' . $alert_quantity . '</span>';
             })
-            // ->addColumn('menus', function($inventories){
-            //     return $inventories->menus->name;
-            // })
             ->addIndexColumn()
             ->rawColumns(['action', 'stock_quantity', 'alert_quantity'])
             ->make(true);

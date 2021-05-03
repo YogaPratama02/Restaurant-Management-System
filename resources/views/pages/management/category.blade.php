@@ -5,10 +5,10 @@
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mt-3">
-                    <div class="card-header" style="background-color:#295192">
+                    <div class="card-header" style="background-color:#90be6d">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-align-justify"></i> Category
                         </h5>
-                        <a href="{{route('category.create')}}" class="btn btn-success btn-sm float-right modal-show text-white" title="Create Category"><i class="fas fa-plus text-white"></i> Create Category</a>
+                        <a href="{{route('category.create')}}" class="btn btn-sm float-right modal-show text-white" style="background-color:#577590" title="Create Category"><i class="fas fa-plus text-white"></i> Create Category</a>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered" style="width:100%">

@@ -11,6 +11,11 @@ class Supplier extends Model
     ];
 
     protected $hidden = [
-        // 
+        //
     ];
+
+    public function user()
+    {
+        return $this->belongsTo('App\User');
+    }
 }

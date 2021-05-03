@@ -35,10 +35,10 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->phone_number = $request->phone_number;
         $user->email = $request->email;
+        $user->email_verified_at = date('Y-m-d H:i:s');
         $user->password = Hash::make($request->password);
         $user->save();
         $user->assignRole($request->input('role'));
-        // return json_encode(true);
     }
 
     public function edit($id)
@@ -74,7 +74,11 @@ class UserController extends Controller
 
     public function DataTable()
     {
-        $users = User::all();
+        $users = User::where(function ($query) {
+            $query->whereHas('roles', function ($query) {
+                return $query->where('name', '!=', 'members');
+            });
+        })->get();
         return DataTables()->of($users)
             ->addColumn('action', function ($users) {
                 return view('pages.user.useraction', [

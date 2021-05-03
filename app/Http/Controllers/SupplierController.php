@@ -27,14 +27,12 @@ class SupplierController extends Controller
             'name' => 'required|max:255',
             'total' => 'required|numeric'
         ]);
-
-        $user = Auth::user();
+        $user = auth()->user();
         $suppliers = new Supplier();
         $suppliers->date = $request->date;
         $suppliers->name = $request->name;
         $suppliers->total = $request->total;
         $suppliers->user_id = $user->id;
-        $suppliers->user_name = $user->name;
         $current = new Carbon;
         $current->timezone('GMT+7');
         $suppliers->created_at = $current;
@@ -74,7 +72,7 @@ class SupplierController extends Controller
 
     public function dataTable()
     {
-        $suppliers = Supplier::all();
+        $suppliers = Supplier::with('user')->get();
         return DataTables()->of($suppliers)
             ->addColumn('action', function ($suppliers) {
                 return view('supplier.supplieraction', [

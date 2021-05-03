@@ -29,13 +29,18 @@
                 <label class="form-check-label" for="remember">{{ __('Remember Me') }}</label>
             </div>
             {{-- <a href="#">Forgot Password</a> --}}
-        </div>
-        <button type="submit" class="btn mt-4 btn-custom btn-block text-uppercase rounded-pill btn-lg">{{ __('Login') }}</button>
-        @if (Route::has('password.request'))
+            @if (Route::has('password.request'))
             <a class="btn btn-link" href="{{ route('password.request') }}">
                 {{ __('Forgot Your Password?') }}
             </a>
-        @endif
+            @endif
+        </div>
+        <button type="submit" class="btn mt-4 btn-custom btn-block text-uppercase rounded-pill btn-lg">{{ __('Login') }}</button>
+        {{-- @if (Route::has('password.request'))
+            <a class="btn btn-link" href="{{ route('password.request') }}">
+                {{ __('Forgot Your Password?') }}
+            </a>
+        @endif --}}
         @guest
             @if (Route::has('register'))
                 <p class="mt-3 font-weight-normal">Don't have an account ? <a href="{{ route('register') }}"><strong>{{ __('Register Now') }}</strong></a></p>

@@ -11,7 +11,6 @@ class TableController extends Controller
 {
     public function index()
     {
-        $tables = Table::all();
         return view('pages.table.index');
     }
 
@@ -42,15 +41,15 @@ class TableController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'name' => 'required|unique:tables|max:255'
+            'name' => 'required'
         ]);
 
         $tables = Table::find($id);
         $tables->name = $request->name;
+        $tables->status = $request->status;
         $current = new Carbon;
         $current->timezone('GMT+7');
         $tables->updated_at = $current;
-        // $tables->update($request->all());
         $tables->save();
     }
 

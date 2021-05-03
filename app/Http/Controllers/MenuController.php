@@ -12,7 +12,6 @@ class MenuController extends Controller
 {
     public function index()
     {
-        $menus = Menu::all();
         return view('pages.menu.index');
     }
 
@@ -42,7 +41,6 @@ class MenuController extends Controller
             $request->image->move(public_path('menu_images'), $imageName);
         }
 
-        // save information to menus table
         $menus = new Menu();
         $menus->name = $request->name;
         $menus->hpp = $request->hpp;
@@ -55,7 +53,6 @@ class MenuController extends Controller
         $menus->created_at = $current;
         $menus->updated_at = $current;
         $menus->save();
-        // dd($menus);
         return json_encode(true);
     }
 

@@ -8,7 +8,7 @@ use App\SaleDetail;
 
 class KitchenWidget extends AbstractWidget
 {
-    public $reloadTimeout = 3;
+    public $reloadTimeout = 2;
     /**
      * The configuration array.
      *
@@ -35,7 +35,7 @@ class KitchenWidget extends AbstractWidget
             $saleDetail->whereHas('sale', function ($saleDetail) {
                 return $saleDetail->where('sale_status', 'unpaid');
             });
-        })->get();
+        })->orderBy('sale_id', 'asc')->get();
 
         // return view('widgets.kitchen_widget', [
         //     'config' => $this->config,

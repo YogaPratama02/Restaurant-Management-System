@@ -7,7 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable, HasRoles;
 
@@ -38,22 +38,12 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    // public function checkAdmin()
-    // {
-    //     if ($this->role == 'admin') {
-    //         return true;
-    //     } else {
-    //         return false;
-    //     }
-    // }
-
-    // public function role()
-
-    // {
-    //     return $this->belongsTo(Category::class);
-    // }
     public function sale()
     {
         return $this->hasMany(Sale::class);
+    }
+    public function suplier()
+    {
+        return $this->hasMany('App\Supplier');
     }
 }

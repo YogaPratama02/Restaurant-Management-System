@@ -18,8 +18,7 @@ class CreateSuppliersTable extends Migration
             $table->date('date');
             $table->string('name');
             $table->decimal('total', 12, 2);
-            $table->integer('user_id');
-            $table->string('user_name');
+            $table->foreignId('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();
         });
     }

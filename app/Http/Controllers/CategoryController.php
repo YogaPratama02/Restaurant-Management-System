@@ -101,8 +101,6 @@ class CategoryController extends Controller
         $category->updated_at = $current;
         $category->save();
         return json_encode(true);
-        // $category->update($request->all());
-        // $category = Category::where('name', $request->oldname)->put(['name'=> $request->newname]);
     }
 
     /**

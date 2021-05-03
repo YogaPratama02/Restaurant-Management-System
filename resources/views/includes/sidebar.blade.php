@@ -1,21 +1,12 @@
 <!-- Main Sidebar Container -->
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
-    <!-- Brand Logo -->
-    {{-- <a href="index3.html" class="brand-link">
-      <img src="{{url('/dashboard/dist/img/AdminLTELogo.png')}}" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-           style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
-    </a> --}}
-
-    <!-- Sidebar -->
     <div class="sidebar">
-      <!-- Sidebar user panel (optional) -->
       <div class="user-panel mt-3 pb-3 mb-3 d-flex">
         <div class="image">
           <img src="{{url('images/restaurant.svg' )}}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">The Proffesor's Caffe</a>
+          <a href="#" class="d-block">Rajapala Coffee</a>
         </div>
       </div>
 
@@ -39,10 +30,9 @@
             @endif
         </li>
         <li class="nav-item">
-            @if(Auth::user()->hasRole('super admin|admin|cashier'))
+            @if(Auth::user()->hasRole('super admin|admin|cashier|members'))
             <a href="{{route('cashier.index')}}" class="nav-link {{(request()->is('cashier*')) ? 'active' : '' }}">
               <i class="fas fa-cash-register" style="margin-left: -0.15rem"></i>
-                {{-- <img width="18px" src="{{asset('images/cashier.svg')}}" style="background: white"> --}}
                 <p>Cashier</p>
             </a>
             @endif
@@ -51,6 +41,13 @@
           @if(Auth::user()->hasRole('super admin|admin'))
           <a href="{{route('table.index')}}" class="nav-link {{(request()->is('*table')) ? 'active' : '' }}"><i class="fas fa-chair"></i>
               <p>Table</p>
+          </a>
+          @endif
+        </li>
+        <li class="nav-item">
+          @if(Auth::user()->hasRole('super admin|admin'))
+          <a href="{{route('voucher.index')}}" class="nav-link {{(request()->is('voucher*')) ? 'active' : '' }}"><i class="fas fa-tag"></i>
+              <p>Voucher</p>
           </a>
           @endif
         </li>
@@ -127,7 +124,7 @@
             </li>
             <li class="nav-item">
               @if(Auth::user()->hasRole('super admin'))
-              <a href="{{route('report.month')}}" class="nav-link {{(request()->is('month*')) ? 'active' : '' }}">
+              <a href="{{route('report.indexmonth')}}" class="nav-link {{(request()->is('month*')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Sale Report By Month</p>
               </a>
@@ -142,18 +139,33 @@
               @endif
             </li>
             <li class="nav-item">
+                @if(Auth::user()->hasRole('super admin'))
               <a href="{{route('purchase.index')}}" class="nav-link {{(request()->is('purchase*')) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Purchase Report</p>
               </a>
+                @endif
+            </li>
+            <li class="nav-item">
+                @if(Auth::user()->hasRole('super admin'))
+              <a href="{{route('customer.index')}}" class="nav-link {{(request()->is('customer*')) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Data Customers</p>
+              </a>
+                @endif
+            </li>
+            <li class="nav-item">
+                @if(Auth::user()->hasRole('super admin'))
+              <a href="{{route('member.index')}}" class="nav-link {{(request()->is('member*')) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Members Customers</p>
+              </a>
+                @endif
             </li>
           </ul>
           @endif
         </li>
-
         </ul>
       </nav>
-      <!-- /.sidebar-menu -->
     </div>
-    <!-- /.sidebar -->
   </aside>

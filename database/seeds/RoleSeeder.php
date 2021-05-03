@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use App\User;
 
 class RoleSeeder extends Seeder
 {
@@ -28,7 +29,7 @@ class RoleSeeder extends Seeder
         ]);
 
         Role::create([
-            'name' => 'customers',
+            'name' => 'members',
             'guard_name' => 'web'
         ]);
     }

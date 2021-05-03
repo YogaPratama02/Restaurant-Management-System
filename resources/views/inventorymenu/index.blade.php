@@ -5,10 +5,10 @@
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mt-3">
-                    <div class="card-header" style="background-color:#295192">
+                    <div class="card-header" style="background-color:#90be6d">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> Inventory
                         </h5>
-                        <a href="{{ route('inventmenu.create') }}" class="btn btn-success btn-sm float-right modal-show text-white" title="Create Menu"><i class="fas fa-plus"></i> Create Details</a>
+                        <a href="{{ route('inventmenu.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#577590" title="Create Inventory"><i class="fas fa-plus"></i> Create Recipe</a>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered" style="width:100%">
@@ -72,11 +72,9 @@
         var form = $('#modal-form form'),
             url = form.attr('action'),
             method = form.attr('method');
-            // method = $('input[name=_method]').val() == undefined ? "POST" ? "PUT";
 
         form.find('.help-block').remove();
         form.find('.form-group').removeClass('has-error');
-        // $('#validation-errors').html('');
 
         $.ajax({
             url: url,

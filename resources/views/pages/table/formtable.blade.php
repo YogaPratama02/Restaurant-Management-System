@@ -9,6 +9,12 @@
         <label for="" class="control-label">Table</label>
         {!! Form::text('name', null, ['class' => 'form-control', 'id' => 'name', 'placeholder="Table.."']) !!}
     </div>
+    @if (Route::is('table.edit') )
+    <div class="form-group">
+        <label for="" class="control-label">Status</label>
+        {!! Form::select('status', ['available' => 'available','unvailable'=>'unvailable'],null, ['class' => 'form-control', 'id' => 'status', 'placeholder="Select Status.."']) !!}
+    </div>
+    @endif
 </div>
 
     <div class="modal-footer">

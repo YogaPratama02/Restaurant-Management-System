@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Table;
-use App\Room;
 use App\Category;
 use App\Menu;
 use App\Sale;
 use App\SaleDetail;
 use App\InventoryMenu;
+use Illuminate\Support\Facades\DB;
 use App\Inventory;
 use App\Ppn;
+use App\Voucher;
+use Carbon\Carbon;
+use PDF;
+
 use Illuminate\Support\Facades\Auth;
+use phpDocumentor\Reflection\Types\Null_;
 
 class CashierController extends Controller
 {
@@ -29,17 +34,18 @@ class CashierController extends Controller
         foreach ($tables as $table) {
             $html .= '<div class="col-md-1 mb-3 mt-2">';
             $html .=
-                '<button class="btn btn-primary btn-table" data-id="' . $table->id . '" data-name="' . $table->name . '">
+                '<button class="btn btn-table text-black" data-id="' . $table->id . '" data-name="' . $table->name . '" style="background-color: #90be6d">
             <img class="img-fluid" src="' . url('/images/table.svg') . '" />
             <br>';
             if ($table->status == 'available') {
-                $html .= '<span class="badge badge-success">' . $table->name . '</span>';
+                $html .= '<span class="badge" style="background-color: #ffd384">' . $table->name . '</span>';
             } else {
-                $html .= '<span class="badge badge-danger">' . $table->name . '</span>';
+                $html .= '<span class="badge" style="background-color: #a6a9b6">' . $table->name . '</span>';
             }
             $html .= '</button>';
             $html .= '</div>';
         }
+
         return $html;
     }
 
@@ -48,17 +54,35 @@ class CashierController extends Controller
         $menus = Menu::where('category_id', $category_id)->get();
         $html = '';
         foreach ($menus as $menu) {
-            $html .= '
-            <div class="col-md-2 text-center">
-                <a class="btn btn-outline-secondary btn-menu" data-id="' . $menu->id . '">
-                    <img class="img-fluid justify-content-between" style="width:110px; height:90px;" src="' . url('/menu_images/' . $menu->image) . '"/>
-                    <br>
-                    ' . $menu->name . '
-                    <br>
-                    Rp' . number_format($menu->price, 3) . '
-                </a>
-            </div>
-            ';
+            $inventmenus = InventoryMenu::where('menu_id', $menu->id)->get();
+            foreach ($inventmenus as $inventmenu) {
+                $invents = Inventory::find($inventmenu->inventory_id);
+                if ($invents->stock_quantity < $invents->alert_quantity) {
+                    $html .= '
+                    <div class="ml-1 mt-2">
+                        <button class="btn btn-outline-secondary btn-menu" data-id="' . $menu->id . '" disabled>
+                            <img class="img-fluid" style="height:120px; width:120px;" src="' . url('/menu_images/' . $menu->image) . '">
+                            <br>
+                            Sold Out
+                            <br>
+                            ' . $menu->name . '
+                            <br>
+                            Rp' . number_format($menu->price) . '
+                        </button>
+                    </div>
+                    ';
+                } else {
+                    $html .= '
+                    <div class="ml-1 mt-2">
+                        <button class="btn btn-outline-secondary btn-menu" style="height:210px; width:200px;" data-id="' . $menu->id . '">
+                            <img class="rounded" style="height:135px; width:125px;" src="' . url('/menu_images/' . $menu->image) . '" >
+                            <p class="font-weight-bold sm" > ' . $menu->name . '</p>
+                            Rp' . number_format($menu->price) . '
+                        </button>
+                    </div>
+                    ';
+                }
+            }
         }
         return $html;
     }
@@ -67,112 +91,64 @@ class CashierController extends Controller
     {
         $menu = Menu::find($request->menu_id);
         $table_id = $request->table_id;
-        $table_name = $request->table_name;
         $sale = Sale::where('table_id', $table_id)->where('sale_status', 'unpaid')->first();
         // crate penjualan baru
         if (!$sale) {
             $user = Auth::user();
             $sale = new Sale();
             $sale->table_id = $table_id;
-            $sale->table_name = $table_name;
             $sale->user_id = $user->id;
             $sale->user_name = $user->name;
             $sale->save();
             $sale_id = $sale->id;
-            // update status table
-            $table = Table::find($table_id);
-            $table->status = "unvailable";
-            $table->save();
         } else {
             // jika sudah ada order
             $sale_id = $sale->id;
-            $saledetail = SaleDetail::where('sale_id', $sale_id)->where('menu_id', $menu->id)->first();
-            if($saledetail){
+            $saledetail = SaleDetail::where('sale_id', $sale_id)->where('menu_id', $menu->id)->where('status', 'NoConfirm')->first();
+
+            if ($saledetail) {
                 $saledetail->quantity++;
                 $saledetail->save();
-                $sale->total_price = $sale->total_price + ($request->quantity * $menu->price) - ($request->quantity * $menu->price * ($menu->discount/100));
+                $sale->total_price = $sale->total_price + ($request->quantity * $menu->price) - ($request->quantity * $menu->price * ($menu->discount / 100));
                 $sale->total_hpp = $sale->total_hpp + ($request->quantity * $menu->hpp);
-                // $ppn = Ppn::all();
-                // foreach($ppn as $ppn){
-                //     $ppn->ppn;
-                // }
-                // $sale->total_price = ($menu->price - ($menu->price * ($menu->discount/100))) * $saledetail->quantity;
-                // $sale->total_price = $sale->total_price + (($sale->total_price * ($ppn->ppn/100)));
-                // $sale->save();
-                // $sale->total_price = $sale->total_price + (($sale->total_price * ($ppn->ppn/100)));
                 $sale->save();
-                // if ($saledetail->status == 'confirm') {
-                //     $ppn = Ppn::all();
-                //     foreach($ppn as $ppn){
-                //         $ppn->ppn;
-                //         $sale->total_price = ($menu->price - ($menu->price * ($menu->discount/100))) * $saledetail->quantity;
-                //         $sale->total_price = $sale->total_price + (($sale->total_price * ($ppn->ppn/100)));
-                //         $sale->save();
-                //     }
-                //     // $haha = SaleDetail::where('sale_id', $sale_id)->where('menu_id', $menu->id)->first();
-                //     // if($haha){
-                //     //     $sale->total_price = ($sale->total_price);
-                //     //     $sale->save();
-                //     // }
-                // }
-                // dd($total_price);
                 $inventmenus = InventoryMenu::where('menu_id', $menu->id)->get();
-                // dd($inventmenus);
-                foreach($inventmenus as $inventmenu){
+                foreach ($inventmenus as $inventmenu) {
                     $invent = Inventory::find($inventmenu->inventory_id);
                     $save = $invent->update([
-                        'stock_quantity' => $invent->stock_quantity - ($inventmenu->consumption * ($saledetail->quantity/$saledetail->quantity))
+                        'stock_quantity' => $invent->stock_quantity - ($inventmenu->consumption * ($saledetail->quantity / $saledetail->quantity))
                     ]);
-                    // dd($save);
                 }
-                    // dd($request);
                 $html = $this->getSaleDetails($sale_id);
                 return $html;
             }
         }
         // tambah menu pesanan ke sale_detail
         $saleDetail = new SaleDetail();
-        // if($saleDetail->status == 'NoConfirm'){
-        //     $saleDetail->status = 'confirm';
-        //     $saleDetail->save();
-        // }
         $saleDetail->sale_id = $sale_id;
         $saleDetail->menu_id = $menu->id;
         $saleDetail->menu_name = $menu->name;
         $saleDetail->menu_price = $menu->price;
         $saleDetail->menu_discount = $menu->discount;
         $saleDetail->quantity = $request->quantity;
-        // $saleDetail_id = $saleDetail->id;
+        $current = new Carbon;
+        $current->timezone('GMT+7');
+        $saleDetail->created_at = $current;
+        $saleDetail->updated_at = $current;
         $saleDetail->save();
-        // $ppn = Ppn::all();
-        // foreach($ppn as $ppn){
-        //     $ppn->ppn;
-        // }
-        // update total_price;
-        // if($saleDetail->status == 'NoConfirm'){
-        //     $ppn = Ppn::all();
-        //     foreach($ppn as $ppn){
-        //         $ppn->ppn;
-        //     }
-        //     $sale->total_price = $sale->total_price + ($sale->total_price * $saleDetail->quantity);
-        //     $sale->save();
-        // }
         $sale->total_hpp = $sale->total_hpp + ($request->quantity * $menu->hpp);
-        $sale->total_price = ($sale->total_price + ($request->quantity * $menu->price) - ($request->quantity * $menu->price * ($menu->discount/100)));
-        // $sale->total_price = $sale->total_price + ($sale->total_price * ($ppn->ppn/100));
-        // dd($total_price);
+        $sale->total_price = ($sale->total_price + ($request->quantity * $menu->price) - ($request->quantity * $menu->price * ($menu->discount / 100)));
+
         $sale->save();
 
         $inventmenus = InventoryMenu::where('menu_id', $menu->id)->get();
         // dd($inventmenus);
-        foreach($inventmenus as $inventmenu){
+        foreach ($inventmenus as $inventmenu) {
             $invent = Inventory::find($inventmenu->inventory_id);
             $save = $invent->update([
                 'stock_quantity' => $invent->stock_quantity - ($inventmenu->consumption * $saleDetail->quantity)
             ]);
-            // dd($save);
         }
-            // dd($request);
         $html = $this->getSaleDetails($sale_id);
         return $html;
     }
@@ -180,13 +156,45 @@ class CashierController extends Controller
     public function getSaleDetailsByTable($table_id)
     {
         $sale = Sale::where('table_id', $table_id)->where('sale_status', 'unpaid')->first();
-        $html = '';
+        $tables = Table::where('status', 'available')->get();
+        $html['sale'] = '';
+        $html['modal'] = '';
         // cek jika ada saledetail yang mempunya sale
         if ($sale) {
             $sale_id = $sale->id;
-            $html .= $this->getSaleDetails($sale_id);
+            $html['sale'] .= $this->getSaleDetails($sale_id);
+            $html['modal'] .= '<button type="button" data-id="' . $sale->table->id . '" class="btn mejaUpdate text-black" style="background-color: #ffd384;" data-toggle="modal" data-target="#modal-move">
+                                Move Table
+                            </button>';
+            $html['modal'] .= '<div class="modal fade" id="modal-move" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <div class="modal-body text-left">
+                                <div class="form-group">
+                                    <label for="" class="control-label">Select Table</label>
+                                    <select class="form-control list_table" id="exampleFormControlSelect1">';
+            foreach ($tables as $table) {
+                $html['modal'] .= '<option value="' . $table->id  . '" class="namaTable">' . $table->name . '</option>';
+            }
+            $html['modal'] .= '</select>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn text-black" data-dismiss="modal" style="background-color: #a6a9b6;">Close</button>
+                                <button type="button" class="btn table_update" data-id="' . $sale->id . '" style="background-color: #90be6d;">Update</button>
+                            </div>
+                            </div>
+                        </div>
+                        </div><hr>';
         } else {
-            $html .= "tidak ada order";
+            $html['sale'] .= '<div class="row justify-content-center align-items-center">
+                            <h4>No Order</h4>
+                        </div>';
         }
         return $html;
     }
@@ -194,72 +202,130 @@ class CashierController extends Controller
     private function getSaleDetails($sale_id)
     {
         $html = '<p hidden>Sale ID: ' . $sale_id . '</p>';
-        $ppn = Ppn::all();
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->get();
+        $total = $ppn->sum('ppn');
         $saleDetails = SaleDetail::where('sale_id', $sale_id)->get();
+        $sale = Sale::all();
+        $voucher = Voucher::where('status', 'Active')->first();
+
         $html .= '<div class="table-responsive-md" style="overflow-y:scroll; height: 400px; border: 1px; solid #343A40">
         <table class="table table-stripped table-white">
-        <thead class="text-white" style="background-color: #295192">
+        <thead class="text-white text-left" style="background-color: #90be6d">
             <tr>
-                <th scope="col">No</th>
                 <th scope="col">Menu</th>
-                <th scope="col">Quantity</th>
-                <th scope="col">Price</th>
-                <th scope="col">Diskon</th>
+                <th scope="col">Qty</th>
+                <th scope="col">Disc</th>
                 <th scope="col">Total</th>
+                <th scope="col">Status</th>
             </tr>
         </thead>
-        <tbody>';
-        $showBtnPayment = true;
-        $i = 0;
+        <tbody class="text-left">';
         foreach ($saleDetails as $saleDetail) {
-            $decreaseButton = '<button class="btn btn-danger btn-sm btn-decrease-quantity" disabled>-</button>';
+            $decreaseButton = '<button class="btn btn-danger btn-sm btn-decrease-quantity" style="background-color: #a6a9b6 disabled>-</button>';
 
             if ($saleDetail->quantity > 0) {
-                $decreaseButton = '<button data-id="' . $saleDetail->id . '" class="btn btn-danger btn-sm btn-decrease-quantity">-</button>';
+                $decreaseButton = '<button data-id="' . $saleDetail->id . '" class="btn btn-sm btn-decrease-quantity" style="background-color: #a6a9b6">-</button>';
             }
-            $html .= '
-                <tr>
-                    <td>'. ++$i .'</td>
-                    <td>' . $saleDetail->menu_name . '</td>
-                    <td>' . $decreaseButton . '  ' . $saleDetail->quantity . ' </td>
-                    <td>' . "Rp " .  number_format($saleDetail->menu_price * $saleDetail->quantity, 0, ',', '.') . '</td>
-                    <td>' . $saleDetail->menu_discount . ' ' .'%'. '</td>
-                    <td>' . "Rp " . number_format(($saleDetail->menu_price * $saleDetail->quantity - $saleDetail->menu_price * $saleDetail->quantity * ($saleDetail->menu_discount/100)), 0, ',', '.') . '</td>';
-            // if ($saleDetail->status == 'NoConfirm') {
-                // $showBtnPayment = false;
-                // $html .= '<td><a data-id="' . $saleDetail->id . '" class="btn btn-danger btn-delete-saledetail"><i class="fas fa-trash"></i></a></td>';
-            // }
+            switch ($saleDetail) {
+                case ($saleDetail->note == Null):
+                    $show_note = '<i class="fas fa-pencil-alt ml-2 mr-2"></i>';
+                    break;
+                default:
+                    $show_note = '<i class="fas fa-comment-dots ml-2 mr-2"></i>';
+                    break;
+            }
 
+            switch ($saleDetail) {
+                case ($saleDetail->status == "NoConfirm"):
+                    $html .= '
+                    <tr>
+                        <td>' . $saleDetail->menu_name . ' <a href="' . route('cashier.note', $saleDetail->id) . '" class="modal_note">' . $show_note . '</a></td>
+                        <td>' . $decreaseButton . '  ' . $saleDetail->quantity . ' </td>
+                        <td>' . $saleDetail->menu_discount . ' ' . '%' . '</td>
+                        <td>' . number_format(($saleDetail->menu_price * $saleDetail->quantity - $saleDetail->menu_price * $saleDetail->quantity * ($saleDetail->menu_discount / 100)), 0, ',', '.') . '</td>';
+                    break;
+                case ($saleDetail->status == 'confirm' or $saleDetail->status == 'waiting' or $saleDetail->status == 'finish'):
+                    $html .= '
+                    <tr>
+                        <td>' . $saleDetail->menu_name . '</td>
+                        <td> ' . $saleDetail->quantity . ' </td>
+                        <td>' . $saleDetail->menu_discount . ' ' . '%' . '</td>
+                        <td>' . "Rp " . number_format(($saleDetail->menu_price * $saleDetail->quantity - $saleDetail->menu_price * $saleDetail->quantity * ($saleDetail->menu_discount / 100)), 0, ',', '.') . '</td>
+                        ';
+                    break;
+                default:
+                    break;
+            }
+
+            switch ($saleDetail) {
+                case ($saleDetail->status == 'confirm'):
+                    $html .= '<td><a data-id="" class="btn text-black" style="background-color: #ffd384; border-radius: 25px;">Confirm..</a></td>';
+                    break;
+                case ($saleDetail->status == 'waiting'):
+                    $html .= '<td><a data-id="" class="btn text-black" style="background-color: #ffd384; border-radius: 25px;">Waiting..</a></td>';
+                    break;
+                case ($saleDetail->status == 'finish'):
+                    $html .= '<td><a data-id="" class="btn text-black" style="background-color: #ffd384; border-radius: 25px;">Ready..</a></td>';
+                    break;
+                default:
+                    break;
+            }
             $html .= '</tr>';
         }
-        foreach($ppn as $ppn){
-            $html .= '<td>PPN: '. $ppn->ppn .' %</td>';
+        $html .= '<td>PPN: ' . $total . ' %</td>';
+        $html .= '</tbody></table>';
+
+        $html .= '<div class="note" style="display: none"></div>';
+        $html .= '</div>';
+        if ($saleDetail->status == 'NoConfirm' && $saleDetail->sale->customer_name != null) {
+            $html .= '<td><button data-id="' . $sale_id . '" class="btn rounded btn-block btn-order-again" style="background-color: #ffd384">Confirm Again..</button></td>';
         }
-        $html .= '</tbody></table></div>';
 
         $sale = Sale::find($sale_id);
+        if ($voucher && $sale->voucher_id == NULL && $saleDetail->status == 'confirm' or $saleDetail->status == 'waiting' or $saleDetail->status == 'finish') {
+            $html .= '<div class="disc">
+                <h5>Masukkan Kode Voucher : ' . $voucher->name . '</h5>
+                <form class="form-inline">
+                <div class="form-group mb-2">
+                <input class="form-control area" placeholder="Voucher..">
+                </div>
+                <button type="submit" data-id="' . $sale_id . '" class="btn mx-sm-3 mb-2 text-black voucher">Input</button>
+                </form></div>';
+        }
         $html .= '<hr>';
-        $html .= '<h3 class="try" data-all="'.($sale->total_price + ($sale->total_price * $ppn->ppn/100)) .'">Total: Rp ' . number_format($sale->total_price + ($sale->total_price * $ppn->ppn/100), 0, ',', '.') . '</h3>';
-        // $sale->total_price = ($sale->total_price + ($sale->total_price * $ppn->ppn/100));
-        // $sale->save();
+        switch ($sale) {
+            case ($sale->voucher_id == NULL):
+                $html .= '<h3 class="try" data-all="' . ($sale->total_price + ($sale->total_price * $total / 100)) . '">Total: Rp ' . number_format($sale->total_price + ($sale->total_price * $total / 100), 0, ',', '.') . '</h3>';
+                break;
+            default:
+                $html .= '<h3 class="try" data-all="' . ($sale->total_price + ($sale->total_price * $total / 100) - ($sale->total_price * $sale->voucher->discount / 100)) . '">Total: Rp ' . number_format($sale->total_price + ($sale->total_price * $total / 100) - ($sale->total_price * $sale->voucher->discount / 100), 0, ',', '.') . '</h3>';
+                break;
+        }
 
-        $detail = SaleDetail::where('sale_id', $sale_id)->first();
-        if ($detail->status == 'confirm') {
+        // if ($sale->voucher_id == NULL) {
+        //     $html .= '<h3 class="try" data-all="' . ($sale->total_price + ($sale->total_price * $total / 100)) . '">Total: Rp ' . number_format($sale->total_price + ($sale->total_price * $total / 100), 0, ',', '.') . '</h3>';
+        // } else {
+        //     $html .= '<h3 class="try" data-all="' . ($sale->total_price + ($sale->total_price * $total / 100) - ($sale->total_price * $sale->voucher->discount / 100)) . '">Total: Rp ' . number_format($sale->total_price + ($sale->total_price * $total / 100) - ($sale->total_price * $sale->voucher->discount / 100), 0, ',', '.') . '</h3>';
+        // }
+
+        if ($saleDetail->status == 'confirm' or $saleDetail->status == 'waiting' or $saleDetail->status == 'finish') {
             $html .= '
             <div class="card-body">
             <div class="panel">
                 <div class="row">
                     <td>Payment Method <br>
-                    <div class="form-control">
-                        <span class="radio-item">
+                    <div class="form-control sizePayment">
+                        <span class="radio-item ">
                             <input type="radio" name="payment_type" class="true" value="cash" checked="checked">
                             <label for="payment_type"> <i class="fa fa-money-bill text-success"></i> Cash</label>
 
                             <input type="radio" name="payment_type" class="true" value="bank transfer">
                             <label for="payment_type"> <i class="fa fa-university text-danger"></i> Bank Transfer</label>
 
-                            <input type="radio" name="payment_type" class="true" value="credit Card">
-                            <label for="payment_type"> <i class="fa fa-credit-card text-info"></i> Credit Card</label>
+                            <input type="radio" name="payment_type" class="true" value="payment Card">
+                            <label for="payment_type"> <i class="fa fa-credit-card text-info"></i> Payment Card</label>
                         </span>
                     </div>
                     </td><br>
@@ -275,8 +341,16 @@ class CashierController extends Controller
             </div>
         </div>
             ';
-            $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-success btn-block btn-payment">Payment</button>';
-        } else {
+            // if ($saleDetail->status == "NoConfirm") {
+            // $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-block btn-payment mt-2" style="background-color: #f9c74f" disabled>Payment</button>';
+            // } else {
+            if (Auth()->User()->hasRole('super admin|admin|cashier')) {
+                $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-block btn-payment mt-2" style="background-color: #f9c74f">Payment</button>';
+            }
+            if (Auth()->User()->hasRole('members')) {
+                $html .= '<button class="btn btn-block mt-2" style="background-color: #ffd384">Harap hubungi cashier untuk transaksi</button>';
+            }
+        } else if ($saleDetail->status == "NoConfirm" && $saleDetail->sale->customer_name == null) {
             $html .= '
             <table class="table table-striped">
                         <tr>
@@ -291,59 +365,74 @@ class CashierController extends Controller
                         </tr>
                     </table>
                 ';
-            $html .= '<button data-id="' . $sale_id . '" class="btn btn-warning btn-block btn-confirm-order">Confirm Order</button>';
+            $html .= '<button data-id="' . $sale_id . '" class="btn btn-block btn-confirm-order" style="background-color: #ffd384">Confirm Order</button>';
         }
-        // $showBtnPayment = false;
+        return $html;
+    }
 
-
-        // $saleDetails = SaleDetail::where('sale_id', $sale_id)->where(['status' => 'confirm']);
-
+    public function confirmAgain(Request $request)
+    {
+        $sale_id = $request->sale_id;
+        $saleDetails = SaleDetail::where('sale_id', $sale_id)->where('status', 'NoConfirm')->update(['status' => 'confirm']);
+        $html = '';
+        $html = $this->getSaleDetails($sale_id);
         return $html;
     }
 
     public function confirmOrder(Request $request)
     {
-        $customer_name = $request->customer_name;
-        $customer_phone = $request->customer_phone;
+        $request->validate([
+            'customer_name' => 'required|max:255'
+        ]);
+        $string = "";
+        if ($request->customer_phone) {
+            $request->validate([
+                'customer_phone' => 'required|max:15'
+            ]);
+            $string = $request->customer_phone;
+        }
         $total_price = $request->total_price;
         $sale_id = $request->sale_id;
         $sale = Sale::find($sale_id);
-        // $ppn = Ppn::all();
-        // foreach($ppn as $ppn){
-        //     $ppn->ppn;
-        // }
-        // $sale->total_price = $total_price;
-        $sale->customer_name = $customer_name;
-        $sale->customer_phone = $customer_phone;
-        // $ppn = Ppn::all();
-        // foreach($ppn as $ppn){
-        //     $ppn->ppn;
-        // }
-        // $sale->total_price = $sale->total_price + ($sale->total_price * ($ppn->ppn/100));
+        $sale->customer_name = $request->customer_name;
+        $sale->customer_phone = $string;
+
         $sale->save();
+        $table = Table::find($sale->table_id);
+        $table->status = 'unvailable';
+        $table->save();
+        $tables = Table::where('status', 'available')->get();
         $saleDetails = SaleDetail::where('sale_id', $sale_id)->update(['status' => 'confirm']);
-        $html = $this->getSaleDetails($sale_id);
+        $html = '';
+        $html .= $this->getSaleDetails($sale_id);
         return $html;
     }
 
-    // public function increaseQuantity(Request $request)
-    // {
-    //     // dd($request);
-    //     // update
-    //     $saleDetail_id = $request->saleDetail_id;
-    //     $saleDetail = SaleDetail::where('id', $saleDetail_id)->first();
-    //     $saleDetail->quantity = $saleDetail->quantity + 1;
-    //     $saleDetail->save();
+    public function voucher(Request $request)
+    {
+        $request->validate([
+            'voucher_id' => 'required'
+        ]);
+        $sale_id = $request->sale_id;
+        $sale = Sale::find($sale_id);
+        $voucher = Voucher::where('name', $request->voucher_id)->first();
+        $sale->voucher_id = $voucher->id;
+        $sale_to_voucher = $sale->voucher->discount;
+        $sale->save();
+        $html['sale'] = '';
+        $html['sale_voucher'] = '';
+        $html['sale_voucher'] .= $sale_to_voucher;
+        $html['sale'] = $this->getSaleDetails($sale_id);
+        return $html;
+    }
 
-    //     // update
-    //     $sale = Sale::where('id', $saleDetail->sale_id)->first();
-    //     $sale->total_price = $sale->total_price + $saleDetail->menu_price - ($saleDetail->menu_price * ($saleDetail->menu_discount/100));
-    //     $sale->save();
-
-    //     $html = $this->getSaleDetails($saleDetail->sale_id);
-
-    //     return $html;
-    // }
+    public function updateTable(Request $request)
+    {
+        $table_id = $request->table_id;
+        $sale = Table::find($table_id);
+        $sale->status = 'available';
+        $sale->save();
+    }
 
     public function decreaseQuantity(Request $request)
     {
@@ -358,32 +447,70 @@ class CashierController extends Controller
         $sale = Sale::where('id', $saleDetail->sale_id)->first();
         $menus = Menu::find($saleDetail->menu_id);
         $sale->total_hpp = $sale->total_hpp -  $menus->hpp;
-        $sale->total_price = $sale->total_price - $saleDetail->menu_price + ($saleDetail->menu_price * ($saleDetail->menu_discount/100));
+        $sale->total_price = $sale->total_price - $saleDetail->menu_price + ($saleDetail->menu_price * ($saleDetail->menu_discount / 100));
         $sale->save();
 
         $menu = Menu::find($saleDetail->menu_id);
         $inventmenus = InventoryMenu::where('menu_id', $menu->id)->get();
-        foreach($inventmenus as $inventmenu){
+        foreach ($inventmenus as $inventmenu) {
             $invent = Inventory::find($inventmenu->inventory_id);
-                $save = $invent->update([
-                    'stock_quantity' => $invent->stock_quantity + ($inventmenu->consumption)
-                ]);
+            $save = $invent->update([
+                'stock_quantity' => $invent->stock_quantity + ($inventmenu->consumption)
+            ]);
         }
 
-        if($saleDetail->quantity == 0){
+        if ($saleDetail->quantity == 0) {
             $saleDetail->delete();
         }
-        $sale = SaleDetail::where('sale_id', $sale_id)->first();
-        if($sale==null){
+        $salez = SaleDetail::where('sale_id', $sale_id)->first();
+        if ($salez == null) {
             $sisi = Sale::find($sale_id)->delete();
-            $table = Table::find($sisi);
-            $table->status = 'available';
-            $table->save();
-            $html = 'tidak ada order';
-        }else{
+            $html = '<div class="row justify-content-center align-items-center">
+                        <h4>No Order</h4>
+                    </div>';
+        } else {
             $html = $this->getSaleDetails($saleDetail->sale_id);
         }
+        return $html;
+    }
 
+    public function notes($id)
+    {
+        $saleDetail = SaleDetail::find($id);
+        return view('cashier.note')->with('saleDetail', $saleDetail);
+    }
+
+    public function mejaPindah(Request $request)
+    {
+        $table_id = $request->table_id;
+        $sale_id = $request->sale_id;
+        $sales = Sale::find($sale_id);
+        $sales->table_id = $table_id;
+        $sales->save();
+        $table = Table::find($sales->table_id);
+        $table->status = 'unvailable';
+        $table->save();
+    }
+
+    public function requestNotes(Request $request)
+    {
+        $request->validate([
+            'note' => 'max:255'
+        ]);
+        $string = "";
+        if ($request->note) {
+            $request->validate([
+                'note' => 'max:255'
+            ]);
+            $string = $request->note;
+        }
+        $saleDetail_id = $request->saleDetail_id;
+        $saleDetail = SaleDetail::find($saleDetail_id);
+        $saleDetail->note = $string;
+        $saleDetail->save();
+        $sale_id = $saleDetail->sale_id;
+        $html = '';
+        $html = $this->getSaleDetails($sale_id);
         return $html;
     }
 
@@ -392,17 +519,33 @@ class CashierController extends Controller
         $saleID = $request->saleID;
         $receiveTotal = $request->receiveTotal;
         $paymentType = $request->paymentType;
-        $ppn = Ppn::all();
-            foreach($ppn as $ppn){
-                $ppn->ppn;
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        if ($ppn == NULL) {
+            $total = 0;
+        } else {
+            $total = $ppn->sum('ppn');
         }
-        // update sale information in the sales table by using sale model
         $sale = Sale::find($saleID);
         $sale->total_received = $receiveTotal;
-        $sale->change = ($receiveTotal - $sale->total_price) - ($sale->total_price * ($ppn->ppn/100));
+        if ($sale->voucher_id != NULL) {
+            $sale->change = ($receiveTotal - $sale->total_price) - ($sale->total_price * ($total / 100) - ($sale->total_price * $sale->voucher->discount / 100));
+        } else {
+            $sale->change = ($receiveTotal - $sale->total_price) - ($sale->total_price * ($total / 100));
+        }
         $sale->payment_type = $paymentType;
         $sale->sale_status = 'paid';
-        $sale->total_price = ($sale->total_price + ($sale->total_price * $ppn->ppn/100));
+        $sale->total_vat = $total;
+        if ($sale->voucher_id != NULL) {
+            $sale->total_vatprice = ($sale->total_price + ($sale->total_price * $total / 100) - ($sale->total_price * $sale->voucher->discount / 100));
+        } else {
+            $sale->total_vatprice = ($sale->total_price + ($sale->total_price * $total / 100));
+        }
+        $current = new Carbon;
+        $current->timezone('GMT+7');
+        $sale->created_at = $current;
+        $sale->updated_at = $current;
         $sale->save();
 
         // update table to available
@@ -411,256 +554,376 @@ class CashierController extends Controller
         $table->save();
 
         // update sale detail
-        $saleDetails = SaleDetail::where('sale_id', $saleID)->update(['status' => 'confirm']);
+        $current = new Carbon;
+        $current->timezone('GMT+7');
+        $saleDetails = SaleDetail::where('sale_id', $saleID)->update(['status' => 'done', 'updated_at' => $current]);
 
         return '/cashier/showReceipt/' . $saleID;
     }
-
-
 
     public function showReceipt($saleID)
     {
         $sale = Sale::find($saleID);
         $saleDetails = SaleDetail::where('sale_id', $saleID)->get();
-        return view('cashier.showReceipt')->with('sale', $sale)->with('saleDetails', $saleDetails);
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        if ($ppn == NULL) {
+            $total = 0;
+        } else {
+            $total = $ppn->sum('ppn');
+        }
+        return view('cashier.showReceipt', ['sale' => $sale, 'saleDetails' => $saleDetails, 'total' => $total]);
+    }
+
+    public function pdf($saleID)
+    {
+        $sale = Sale::find($saleID);
+        $saleDetails = SaleDetail::where('sale_id', $saleID)->get();
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        if ($ppn == NULL) {
+            $total = 0;
+        } else {
+            $total = $ppn->sum('ppn');
+        }
+        $pdf = \PDF::loadView('pdf', ['sale' => $sale, 'saleDetails' => $saleDetails, 'total' => $total]);
+        return $pdf->download('invoice.pdf');
     }
 }
 
+index
 
-<div class="mb-1 hehe">
-                        <button class="btn btn-outline-secondary btn-menu" data-id="' . $menu->id . '" disabled>
-                        <img class="img-fluid justify-content-between images" style="width:110px; height:90px;" src="' . url('/menu_images/' . $menu->image) . '"/>
-                        <div class="banner-text">
-                            <h4 class="grid-content">Sold Out</h4>
-                            <h5>' . $menu->name . '</h5>
-                            <p> Rp' . number_format($menu->price, 3) . '</p>
-                        </div>
-                        </button>
-                    </div>
-                    @extends('layouts.default')
+@extends('layouts.default')
 
 @section('content')
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.css">
+    <link type="text/css" rel="stylesheet" href="{{asset('/css/form.css')}}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     <div class="container">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 form-group input-daterange">
-                    <input type="text" name="date_start" id="date_start" class="form-control text-center" placeholder="from date.." readonly style="width: 300px;" />
-                </div>
-                <div class="col-md-4 form-group dt2">
-                    <input type="text" name="date_end" id="date_end" class="form-control text-center" placeholder="end date.." readonly style="width: 300px;"  />
-                </div>
-                <div class="col-md-4">
-                    <button type="button" name="filter" id="filter" class="btn btn-primary">Filter</button>
-                    <button type="button" name="refresh" id="refresh" class="btn btn-primary">Refresh</button>
-                </div>
+        <div class="row" id="table-detail"></div>
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <button class="btn btn-block" id="btn-show-tables" style="background-color: #ffd384">View All Table</button>
+                <div class="table_name text-center"></div>
+                <div class="move_table text-center"></div>
             </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="col-md-12 text-center">
-                        <div style="font-size: 26px; font-weight: bold">Monthly Sale Report</div>
-                        <span id="e" style="font-size: 24px"></span>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-bordered text-center" style="width:100%">
-                            <thead>
-                                <tr class="text-lite text-center">
-                                    <th scope="col">No</th>
-                                    <th scope="col">Month</th>
-                                    <th scope="col">Total HPP</th>
-                                    <th scope="col">Total Price</th>
-                                    <th scope="col">Total Sale</th>
-                                </tr>
-                            </thead>
-                            <tbody id="d">
-
-                            </tbody>
-                            <tfoot id="hi">
-                            </tfoot>
-                        </table>
-                    </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-5">
+                <div class="flex-container">
+                    @foreach ($categories as $category)
+                    {{-- <div class="flex-container1"> --}}
+                        <a class="show_menu" data-id="{{$category->id}}">{{$category->name}}</a>
+                    {{-- </div> --}}
+                    @endforeach
                 </div>
+                <div id="list-menu" class="row mt-1"></div>
             </div>
-            <div class="row">
-                <div class="col-md-12" id="c"></div>
-                <div class="col-md-12" id="u"></div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card-body">
-                        <table class="table table-bordered text-center" style="width:100%">
-                            <thead>
-                                <tr class="text-lite text-center">
-                                    <th scope="col">No</th>
-                                    <th scope="col">Menu Name</th>
-                                    <th scope="col">Total Sold</th>
-                                </tr>
-                            </thead>
-                            <tbody id="k">
-
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12" >
-                    <canvas id="chart"></canvas>
-                </div>
-            </div>
+            <div class="col-md-7" id="order"></div>
+            {{-- <div class="col-md-7" id="wrwr"></div> --}}
         </div>
     </div>
 @endsection
 
 @push('after-script')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
-
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/numeral.js/2.0.6/numeral.min.js"></script>
     <script type="text/javascript">
-        // $(document).ready(function(){
-                $('#date_start').datepicker({
-                    format: 'dd-mm-yyyy',
-                    minViewMode: 1,
-                    autoclose: true
-                    // viewMode: "months", //this
-                    // minViewMode: "months",
+        $(document).ready(function(){
+            $('#table-detail').hide();
+
+            $('#btn-show-tables').click(function(){
+                if($('#table-detail').is(':hidden')){
+                    $.get('/cashier/getTable', function(data){
+                        $('#table-detail').html(data);
+                        $('#table-detail').slideDown('fast');
+                        $('#btn-show-tables').html('Hide Tables').css('background-color', '#a6a9b6');
+                    })
+                }else{
+                    $('#table-detail').slideUp('slow');
+                    $('#btn-show-tables').html('View All Table').css('background-color', '#ffd384');
+                }
+            });
+            $(".show_menu").click(function(){
+                $.get("/cashier/getMenu/"+$(this).data("id"),function(data){
+                    $('#list-menu').html(data);
                 });
+            });
+            $(".show_menu").dblclick(function(){
+                $.get("/cashier/getMenu/"+$(this).data("id"),function(data){
+                    $('#list-menu').toggle()
+                    $('#list-menu').hide()
+                });
+            });
+            $(".show_menu").click(function(){
+                $.get("/cashier/getMenu/"+$(this).data("id"),function(data){
+                    $('#list-menu').show();
+                });
+            });
+            var table_id = "";
+            var table_name = "";
+            var sale_id = "";
+            var menu_discount = "";
+            var quantity = "";
+            $('#table-detail').on('click', '.btn-table', function(){
+                table_id = $(this).data('id');
+                table_name = $(this).data('name');
+                id = $(this).data('id');
+                $('.table_name').html('<br><h3>Table: '+table_name+'</h3>');
+                $.get('/cashier/getSaleDetailsByTable/'+table_id, function(data){
+                    $('#order').html(data.sale);
+                    $('.move_table').html(data.modal);
+                });
+            });
 
-                // var today = new Date();
-                // var month = today.getMonth();
-                // var year = today.getFullYear();
-
-                // var lastDate = new Date(year, month + 1, 0);
-                // var lastDay = lastDate.getDate();
-
-                $("#date_end").datepicker({
-                    format: 'dd-mm-yyyy',
-                    minViewMode: 1,
-                    autoclose: true,
-                    }).on('changeDate',function(e)
-                        {
-                            $("#date_end").datepicker('update', new Date(e.date.getFullYear(), e.date.getMonth() + 1, 0));
+            $('#list-menu').on('click', '.btn-menu', function(){
+                if(table_id == ""){
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-right',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        timerProgressBar: true,
+                        background: '#a6a9b6',
+                        })
+                        Toast.fire({
+                            html: '<p class="select-table">Pilih Table terlebih dahulu!</p>',
                         });
-
-                month_data();
-                function month_data(date_start = '', date_end='')
-                {
+                }else{
+                    var menu_id = $(this).data('id');
                     $.ajax({
-                        url: "{{route('report.month')}}",
-                        type: "GET",
-                        dataType:"json",
-                        data: {date_start: date_start, date_end:date_end},
-                        success: function(data)
-                        {
-                            $('#d').html(data.menuz);
-                            $('#hi').html(data.tal);
-                            $('#c').html(data.cash);
-                            $('#u').html(data.bank);
-                            $('#k').html(data.menu);
+                        type: "POST",
+                        data: {
+                            '_token' :'{{ csrf_token() }}',
+                            'menu_id': menu_id,
+                            'table_id': table_id,
+                            'quantity': 1,
+                            'menu_discount': menu_discount
                         },
-                        error: function(data)
-                        {
-                            alert('not responding');
+                        url: '/cashier/order',
+                        success: function(data){
+                            $('#order').html(data);
                         }
                     });
                 }
-
-
-                $('#filter').click(function(){
-                    var date_start = $('#date_start').val();
-                    var date_end = $('#date_end').val();
-                    if(date_start != '' && date_end != ''){
-                        $('#e').html(date_start).append(' to ', date_end );
-                        month_data(date_start, date_end);
-                    }else{
-                        alert('Both date is required');
+            });
+            $('#order').on('click', '.btn-confirm-order', function(data){
+                let SaleID = $(this).data('id');
+                let customer_name = $('#customer_name').val();
+                let customer_phone = $('#customer_phone').val();
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        '_token' :'{{ csrf_token() }}',
+                        'sale_id': SaleID,
+                        'customer_name': customer_name,
+                        'customer_phone': customer_phone
+                    },
+                    url: '/cashier/confirmOrder',
+                    success: function(data){
+                        $('#order').html(data);
                     }
                 });
-
-                $('#refresh').click(function(){
-                    $('#date_start').val('');
-                    $('#date_end').val('');
-                    $('#e').html('');
-                    month_data();
-                });
-            // });
-            var data = "{{ route('report.month') }}";
-            let myChart = document.getElementById('chart').getContext('2d');
-            let a = new Chart(myChart, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(data),
-                    datasets: [{
-                        label: 'Population',
-                        data: Object.values(data),
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.6)',
-                            'rgba(54, 162, 235, 0.6)',
-                            'rgba(255, 206, 86, 0.6)',
-                            'rgba(75, 99, 132, 0.6)',
-                            'rgba(153, 102, 255, 0.6)',
-                            'rgba(255, 159, 64, 0.6)',
-                        ],
-                        borderWidth: 2,
-                        borderColor: '#777',
-                    }]
-                },
-                options: {}
             });
+
+            $('#order').on('click', '.btn-order-again', function(data){
+                let SaleID = $(this).data('id');
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        '_token' :'{{ csrf_token() }}',
+                        'sale_id': SaleID
+                    },
+                    url: '/cashier/confirmAgain',
+                    success: function(data){
+                        $('#order').html(data);
+                    }
+                });
+            });
+            $('body').on('click', '.modal_note', function(event){
+                event.preventDefault();
+                var me = $(this),
+                    url = me.attr('href');
+                $.ajax({
+                    url: url,
+                    dataType: 'html',
+                    success: function(response){
+                        $('.note').html(response).toggle(500);
+                    },
+                    error: function(response){
+                        alert('not response');
+                    }
+                });
+            });
+            $('body').on('click', '.mejaUpdate', function(event){
+                event.preventDefault();
+                var table_id = $(this).data('id');
+                $.ajax({
+                    method: 'POST',
+                    data : {
+                        '_token' :'{{ csrf_token() }}',
+                        'table_id' : table_id,
+                    },
+                    url : '/cashier/updateTable',
+                    success : function(response){
+
+                    },
+                    error : function(response){
+                        alert('not responding');
+                    }
+                });
+            });
+
+            $('.move_table').on('click', '.table_update', function(){
+                let sale_id = $(this).data('id');
+                let table_id = $('.list_table').val();
+                $.ajax({
+                    method: 'POST',
+                    data : {
+                        '_token' :'{{ csrf_token() }}',
+                        'table_id' : table_id,
+                        'sale_id' : sale_id
+                    },
+                    url : '/cashier/mejaPindah',
+                    success : function(response){
+                        $('#modal-move').modal('hide');
+                        $('#table-detail').slideUp('fast');
+                        const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timerProgressBar: true,
+                        timer: 2000,
+                        background: '#ffd56b'
+                        });
+                        Toast.fire({
+                            title : "berhasil pindah Table, silahkan click table yang sudah dipilih!"
+                        });
+                        setTimeout(function() {
+                            window.location.replace('/cashier');
+                        },3000);
+                    },
+                    error : function(response){
+                        alert('not responding');
+                    }
+                });
+            });
+
+            $('#order').on('click', '.voucher', function(){
+                event.preventDefault();
+                let sale_id = $(this).data('id');
+                let voucher_id = $('.area').val();
+                $.ajax({
+                    type : 'POST',
+                    data: {
+                        '_token' :'{{ csrf_token() }}',
+                        'voucher_id' : voucher_id,
+                        'sale_id' : sale_id,
+                    },
+                    url : '/cashier/voucher',
+                    success: function(data){
+                        $('#order').html(data.sale);
+                        const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true,
+                        background: '#ffd56b',
+                        })
+                        Toast.fire({
+                            title: `Selamat, kamu mendapatkan voucher diskon sebesar ${data.sale_voucher} %!`,
+                        });
+
+                    },
+                    error: function(data){
+                        alert('not responding')
+                    }
+                })
+            });
+
+            $('#order').on('click', '.update_note', function(){
+                let SaleDe = $(this).data('id');
+                let note = $('.text-area').val();
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        '_token' :'{{ csrf_token() }}',
+                        'saleDetail_id': SaleDe,
+                        'note' : note
+                    },
+                    url: '/cashier/update/',
+                    success: function(data){
+                        $('#order').html(data);
+                    },
+                    error: function(data){
+                        alert('gagal');
+                    }
+                })
+            });
+
+            // decrease quantity
+            $('#order').on('click', '.btn-decrease-quantity', function(){
+                let saleDetailID = $(this).data('id')
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        '_token' :'{{ csrf_token() }}',
+                        'saleDetail_id': saleDetailID,
+                    },
+                    url: '/cashier/decrease-quantity',
+                    success: function(data){
+                        $('#order').html(data);
+                    }
+                });
+            });
+
+            $('#order').on('keyup', '#paid_amount', function(){
+                let totalAmount = $(".try").attr('data-all');
+                let paid_amount = $(this).val();
+                let balance = (paid_amount - totalAmount);
+                let inp = (balance/1000).toFixed(3);
+                $('#balance').val(inp);
+                if(paid_amount <= 1){
+                    $('#balance').val(null);
+                }else{
+                    $('#balance').val(inp);
+                }
+
+                if(balance >= 0){
+                    $('.btn-payment').prop('disabled', false);
+                }else{
+                    $('.btn-payment').prop('disabled', true);
+                }
+
+            });
+
+            // calculate
+            // save payment
+
+            $('#order').on('click', '.btn-payment', function(data){
+                sale_id = $(this).data('id');
+                let paid_amount = $('#paid_amount').val();
+                let paymentType = $(".true:checked").val();
+                let saleId = sale_id;
+
+                $.ajax({
+                    type: 'POST',
+                    data: {
+                        '_token' :'{{ csrf_token() }}',
+                        'saleID': saleId,
+                        'receiveTotal': paid_amount,
+                        'paymentType': paymentType
+                    },
+                    url: '/cashier/savePayment',
+                    success: function(data){
+                        window.location.href=data
+                    }
+                })
+            });
+        });
     </script>
 @endpush
-<?php
-
-namespace App\Exports;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use App\Sale;
-use Illuminate\Contracts\View\View;
-use Maatwebsite\Excel\Concerns\FromView;
-
-class SaleReportExport implements FromView
-{
-    private $date_start;
-    private $date_end;
-    private $sales;
-    private $totalSale;
-    public function __construct(Request $request)
-    {
-        $date_start = date("Y-m-d H:i:s", strtotime($date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($date_end));
-
-        $sales = Sale::whereBetween('updated_at', [$date_start, $date_end])->where('sale_status', 'paid')->get();
-        $totalSale = $sales->sum('total_price');
-        $this->date_start = $date_start;
-        $this->date_end = $date_end;
-        $this->sales = $sales;
-        $this->totalSale = $totalSale;
-    }
-
-    public function view(): View
-    {
-        return view('exports.salereport', [
-            'date_start' => $this->date_start,
-            'date_end' => $this->date_end,
-            'sales' => $this->sales,
-            'totalSale' => $this->totalSale
-        ]);
-    }
-}
-
-excel_data();
-                function excel_data(date_start = '', date_end=''){
-                $(document).on('click', '.excel', function(){
-                    $.ajax({
-                        method: "GET",
-                        url: "{{route('report.excel')}}",
-                        data: {date_start: date_start, date_end:date_end},
-                        success: function(response) {
-                            window.location.href = "{{route('report.excel')}}";
-                        }
-                    });
-                    // console.log({date_start: date_start, date_end:date_end});
-                });
-            }
-
 

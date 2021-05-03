@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Sale extends Model
 {
     protected $fillable = [
-        'table_id', 'table_name', 'user_id', 'user_name', 'customer_name', 'customer_phone', 'total_hpp', 'total_price', 'total_vat', 'total_vatprice', 'total_received', 'change', 'payment_type', 'sale_status'
+        'table_id', 'voucher_id', 'user_id', 'user_name', 'customer_name', 'customer_phone', 'total_hpp', 'total_price', 'total_vat', 'total_vatprice', 'total_received', 'change', 'payment_type', 'sale_status'
     ];
     public function saleDetails()
     {
@@ -27,5 +27,9 @@ class Sale extends Model
     public function table()
     {
         return $this->belongsTo(Table::class);
+    }
+    public function voucher()
+    {
+        return $this->belongsTo('App\Voucher');
     }
 }

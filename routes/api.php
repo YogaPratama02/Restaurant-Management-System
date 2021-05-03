@@ -14,15 +14,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/cashier/order', 'CashierController@getOrder');
-// Route::post('/cashier/order', 'CashierController@getOrder');
-Route::post('/cashier/increase-quantity', 'CashierController@increaseQuantity');
-Route::post('/cashier/decrease-quantity', 'CashierController@decreaseQuantity');
-Route::get('/report/dataTable', 'ReportController@dataTable')->name('report.dataTable');
-Route::get('/report/detail/{id}', 'ReportController@detail')->name('report.detail');
-
-Route::get('/month', 'ReportController@month')->name('report.month');
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });

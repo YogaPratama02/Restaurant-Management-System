@@ -8,7 +8,7 @@
                 font-family: Arial, Helvetica, sans-serif;
                 font-size: 12px;
             }
-            #resturant-name,
+            #restaurant-name,
             #receipt-footer {
                 text-align: center;
             }
@@ -32,9 +32,8 @@
             .tb-sale-total tr:first-child td:nth-child(3) {
                 border-left: 1px solid #999;
             }
-            .tb-sale-total tr:first-child td:nth-child(4) {
+            .change {
                 text-align: right;
-                padding-left: 1.5%;
             }
             .tb-sale-total tr:not(:first-child) {
                 background-color: #ccc;
@@ -42,21 +41,6 @@
             .tb-sale-total tr:not(:first-child) td:nth-child(2) {
                 text-align: right;
                 padding-right: 1.5%;
-            }
-            .btn {
-                width: 100%;
-                cursor: pointer;
-                text-align: center;
-                border-radius: 5px;
-                padding: 10px;
-                margin: 5px 0;
-                border: none;
-            }
-            .btn-print {
-                background-color: #ffa93c;
-            }
-            .btn-back {
-                background-color: #4fa950;
             }
             .me, .we {
                 font-size: 14px;
@@ -69,7 +53,7 @@
         </style>
         <div id="wrapper">
             <div id="receipt-header">
-              <h1 id="resturant-name">The Professor's Caffe</h1>
+              <h2 id="restaurant-name">Rajapala Coffee</h2>
               <p class="me">JL. KH Ahmad Dalan No. 18, Kebayboran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta,121 30</p>
               <p class="we">Tel: 473-XXXX-XXXX</p>
             </div>
@@ -99,28 +83,43 @@
               <table class="tb-sale-total">
                 <tbody>
                   <tr>
-                    <td>VAT</td>
-                    <td>{{$total}}%</td>
-                    <td>Total</td>
-                    <td>Rp{{number_format($sale->total_price + $sale->total_price * $total/ 100, 0, ',', '.' )}}</td>
+                    <td colspan="3">VAT</td>
+                    <td colspan="4" class="change">{{$total}} %</td>
                   </tr>
+                  @if ($sale->voucher_id != NULL)
                   <tr>
-                    <td colspan="3">Type Pembayaran</td>
-                    <td colspan="4">{{$sale->payment_type}}</td>
+                    <td colspan="3">Discount</td>
+                    <td colspan="4" class="change">{{$sale->voucher->discount}} %</td>
+                  </tr>
+                  @endif
+                  @if ($sale->voucher_id != NULL)
+                  <tr>
+                    <td colspan="3">Total</td>
+                    <td colspan="4" class="change">Rp{{number_format($sale->total_price + ($sale->total_price * $total/ 100) - ($sale->total_price * $sale->voucher->discount / 100), 0, ',', '.' )}}</td>
+                  </tr>
+                  @else
+                  <tr>
+                    <td colspan="3">Total</td>
+                    <td colspan="4" class="change">Rp{{number_format($sale->total_price + ($sale->total_price * $total/ 100), 0, ',', '.' )}}</td>
+                  </tr>
+                  @endif
+                  <tr>
+                    <td colspan="3">Tipe Pembayaran</td>
+                    <td colspan="4" class="change">{{$sale->payment_type}}</td>
                   </tr>
                   <tr>
                     <td colspan="3">Jumlah Pembayaran</td>
-                    <td colspan="4">Rp{{number_format($sale->total_received, 0, ',', '.')}}</td>
+                    <td colspan="4" class="change">Rp{{number_format($sale->total_received, 0, ',', '.')}}</td>
                   </tr>
                   <tr>
                     <td colspan="3">Total Kembali</td>
-                    <td colspan="4">Rp{{number_format($sale->change, 0, ',', '.')}}</td>
+                    <td colspan="4" class="change">Rp{{number_format($sale->change, 0, ',', '.')}}</td>
                   </tr>
                 </tbody>
               </table>
             </div>
             <div id="receipt-footer">
-              <p class="thanks">Thank You!!!</p>
+              <h5 class="thanks">Thank You!!!</h5>
             </div>
         </div>
     </body>

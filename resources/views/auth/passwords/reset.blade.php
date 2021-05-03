@@ -1,12 +1,43 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
-    <div class="row justify-content-center">
+<link type="text/css" rel="stylesheet" href="{{asset('/css/cobaregister.css')}}">
+<div class="login-container d-flex align-items-center justify-content-center">
+    <form method="POST" action="{{ route('password.update') }}" class="login-form text-center">
+        @csrf
+        <img width="170rem" class="mb-5 font-weight-light" src="{{asset('images/restaurant.svg')}}"/>
+
+        <input type="hidden" name="token" value="{{ $token }}">
+
+        <div class="form-group">
+            <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
+            @error('email')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+        <div class="form-group">
+            <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password" placeholder="New Password..">
+            @error('password')
+                <span class="invalid-feedback" role="alert">
+                    <strong>{{ $message }}</strong>
+                </span>
+            @enderror
+        </div>
+        <div class="form-group">
+            <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password" placeholder="Password Confirm..">
+        </div>
+        <button type="submit" class="btn mt-4 btn-custom btn-block text-uppercase rounded-pill btn-lg">
+            {{ __('Reset Password') }}
+        </button>
+    </form>
+</div>
+{{-- <div class="container mt-5">
+    <div class="row d-flex align-items-center justify-content-center">
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">{{ __('Reset Password') }}</div>
-
                 <div class="card-body">
                     <form method="POST" action="{{ route('password.update') }}">
                         @csrf
@@ -61,5 +92,5 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 @endsection

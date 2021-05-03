@@ -6,11 +6,11 @@
 
 <div id="wrapper">
     <div class="receipt-header">
-        <h3 id="restaurant-name">{{ __("The Professor's Caffe") }}</h3>
+        <h3 id="restaurant-name">{{ __("Rajapala Coffee") }}</h3>
     </div>
     <div class="receipt text-center" style="text-align: center;">
-        <p>JL. KH Ahmad Dalan No. 18, Kebay<br>oran Baru, Kramat Peta, Kota Jak<br>arta Selatan, DKI Jakarta,121 30</p>
-        <p>081381517194</p>
+        <p>JL. KH Ahmad Dalan No. 18, Kebayboran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta,121 30</p>
+        <p>Tel: 473-XXXX-XXXX</p>
     </div>
     <div class="receipt-body">
         <table class="table-sale-detail">
@@ -38,12 +38,27 @@
         <table class="table-sale-total">
             <tbody>
                 <tr>
-                    <td>VAT</td>
-                    <td>{{$total}}%</td>
-                    <td>Total</td>
-                    <td>Rp{{number_format($sale->total_price + $sale->total_price * $total/ 100, 0, ',', '.' )}}</td>
-                    {{-- <td width="60">{{$saleDetail->menu_discount}}</td> --}}
+                    <td colspan="2">VAT</td>
+                    <td colspan="2" class="text-right">{{$total}} %</td>
                 </tr>
+                @if ($sale->voucher_id != NULL)
+                <tr>
+                    <td colspan="2">Discount</td>
+                    <td colspan="2">{{$sale->voucher->discount}} %</td>
+                </tr>
+                @endif
+
+                @if ($sale->voucher_id != NULL)
+                <tr>
+                    <td colspan="2">Total</td>
+                    <td colspan="2">Rp{{number_format($sale->total_price + ($sale->total_price * $total/ 100) - ($sale->total_price * $sale->voucher->discount / 100), 0, ',', '.' )}}</td>
+                </tr>
+                @else
+                <tr>
+                    <td colspan="2">Total</td>
+                    <td colspan="2">Rp{{number_format($sale->total_price + ($sale->total_price * $total/ 100), 0, ',', '.' )}}</td>
+                </tr>
+                @endif
                 <tr>
                     <td colspan="2">Tipe Pembayaran</td>
                     <td colspan="2">{{$sale->payment_type}}</td>
@@ -76,7 +91,4 @@
 @endsection
 
 @push('after-script')
-<script src="https://cdn.jsdelivr.net/npm/recta/dist/recta.js"></script>
-<script type="text/javascript">
-</script>
 @endpush

@@ -1,17 +1,17 @@
 @extends('layouts.default')
 
 @section('content')
-    <div class="container col-md-12">
+    <div class="container">
         <div class="row justify-content-center">
-            <div class="">
+            <div class="col-md-12">
                 <div class="card mt-3">
-                    <div class="card-header" style="background-color:#295192">
+                    <div class="card-header" style="background-color:#90be6d">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-hamburger"></i> Menu
                         </h5>
-                        <a href="{{ route('menu.create') }}" class="btn btn-success btn-sm float-right modal-show text-white" title="Create Menu"><i class="fas fa-plus text-white"></i> Create Menu</a>
+                        <a href="{{ route('menu.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#577590" title="Create Menu"><i class="fas fa-plus text-white"></i> Create Menu</a>
                     </div>
                     <div class="card-body">
-                        <table id="datatable" class="table table-bordered" style="width:100%">
+                        <table id="datatable" class="table table-bordered table-responsive" style="width:100%">
                             <thead>
                                 <tr class="text-center">
                                     <th>No</th>
