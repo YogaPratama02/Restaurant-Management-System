@@ -8,3 +8,17 @@
 @import "~bootstrap/scss/bootstrap";
 
 @import "~tempusdominus-bootstrap-4/src/sass/tempusdominus-bootstrap-4";
+
+
+.nav-pills .nav-link {
+    color: #fff;
+    cursor: default;
+    background-color: #868686;
+}
+
+.nav-pills .nav-link.active {
+    color: #000;
+    cursor: default;
+    background-color: #afafaf;
+    font-weight: bold;
+}

@@ -103,6 +103,12 @@
     cursor: pointer;
 }
 
+/* .nav-pills .nav-link {
+    color: #fff;
+    cursor: default;
+    background-color: #868686;
+} */
+
 .flex-container > a {
     background-color: #F3B949;
     border-radius: 10px;

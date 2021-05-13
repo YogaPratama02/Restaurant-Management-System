@@ -1,0 +1,6 @@
+.nav-pills .nav-link.active {
+    color: #000;
+    cursor: default;
+    background-color: #97cf6e !important;
+    font-weight: bold;
+}

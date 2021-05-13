@@ -4264,6 +4264,10 @@ input[type="button"].btn-block {
   transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
+/* .layout-fixed .main-sidebar {
+    background-color: red;
+} */
+
 @media (prefers-reduced-motion: reduce) {
   .custom-control-label::before,
   .custom-file-label,
