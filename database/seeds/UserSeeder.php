@@ -5,6 +5,7 @@ use Faker\Factory as Faker;
 use App\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class UserSeeder extends Seeder
 {
@@ -68,6 +69,7 @@ class UserSeeder extends Seeder
                 'name' => $faker->name(),
                 'email' => $faker->unique()->email,
                 'phone_number' => $faker->phoneNumber(),
+                'email_verified_at' => Carbon::now(),
                 'password' => bcrypt('secret12345')
             ]);
             DB::table('model_has_roles')->insert([

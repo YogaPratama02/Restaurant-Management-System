@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title','SIGN UP')
+
 @section('content')
 <link type="text/css" rel="stylesheet" href="{{asset('/css/cobaregister.css')}}">
 <div class="login-container d-flex align-items-center justify-content-center">

@@ -1,5 +1,7 @@
 @extends('layouts.default')
 
+@section('title','POS')
+
 @section('content')
     <link type="text/css" rel="stylesheet" href="{{asset('/css/form.css')}}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">

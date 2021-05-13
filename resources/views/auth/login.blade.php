@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('title','SIGN IN')
+
 @section('content')
 <link type="text/css" rel="stylesheet" href="{{asset('/css/cobalogin.css')}}">
 <div class="login-container d-flex align-items-center justify-content-center">

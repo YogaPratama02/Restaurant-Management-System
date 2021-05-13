@@ -1,5 +1,7 @@
 @extends('layouts.default')
 
+@section('title','Customers')
+
 @section('content')
     <div class="contaier">
         <div class="row justify-content-center">

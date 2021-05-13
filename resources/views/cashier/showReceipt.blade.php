@@ -1,5 +1,7 @@
 @extends('layouts.default')
 
+@section('title','Receipt')
+
 @section('content')
 <link type="text/css" rel="stylesheet" href="{{asset('/css/receipt.css')}}" media="all">
 <link type="text/css" rel="stylesheet" href="{{asset('/css/no-print.css')}}" media="print">
@@ -11,6 +13,9 @@
     <div class="receipt text-center" style="text-align: center;">
         <p>JL. KH Ahmad Dalan No. 18, Kebayboran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta,121 30</p>
         <p>Tel: 473-XXXX-XXXX</p>
+    </div>
+    <div class="date">
+        <p>Date: {{ \Carbon\Carbon::now()->timezone('GMT+7')->format('d-m-Y H:i') }}</p>
     </div>
     <div class="receipt-body">
         <table class="table-sale-detail">
@@ -83,7 +88,7 @@
                 Back To Cashier
             </button>
         </a>
-        <a href="{{ url('/cashier/pdf/'. $sale->id) }}" class="btn btn-print" type="button" id="huehue">
+        <a href="{{ url('/cashier/pdf/'. $sale->id) }}" class="btn btn-print" type="button">
             Print
         </a>
     </div>

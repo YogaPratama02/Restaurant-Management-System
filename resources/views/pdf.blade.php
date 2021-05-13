@@ -57,6 +57,9 @@
               <p class="me">JL. KH Ahmad Dalan No. 18, Kebayboran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta,121 30</p>
               <p class="we">Tel: 473-XXXX-XXXX</p>
             </div>
+            <div class="date">
+                <p>Date: {{ \Carbon\Carbon::now()->timezone('GMT+7')->format('d-m-Y H:i') }}</p>
+            </div>
             <div id="receipt-body">
               <table class="tb-sale-detail">
                 <thead>

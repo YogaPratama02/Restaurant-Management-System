@@ -7,6 +7,8 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Validator;
+use Auth;
 
 class LoginController extends Controller
 {
@@ -29,14 +31,14 @@ class LoginController extends Controller
      * @var string
      */
     // protected $redirectTo = RouteServiceProvider::HOME;
-    protected function authenticated(Request $request, $user)
-    {
-        if ($user->hasRole('super admin')) {
-            return redirect('/category');
-        }
+    // protected function authenticated(Request $request, $user)
+    // {
+    //     if ($user->hasRole('super admin')) {
+    //         return redirect('/category');
+    //     }
 
-        return redirect()->route('cashier.index');
-    }
+    //     return redirect()->route('cashier.index');
+    // }
     /**
      * Create a new controller instance.
      *
@@ -46,6 +48,37 @@ class LoginController extends Controller
     {
         $this->middleware('guest')->except('logout');
         // $this->middleware(['role:super-admin']);
+    }
+
+    public function login(Request $request)
+    {
+        $messages = [
+            'email.required' => 'Email harus diisi',
+            'email.email' => 'Email tidak valid',
+            'email.exists' => "Email tidak ada",
+            'password.required' => 'Password harus diisi',
+            'password.min' => 'Password minimal 10 karakter',
+        ];
+
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:10'
+        ], $messages);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        } else {
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
+                if (Auth::user()->hasAllRoles('super admin')) {
+                    return redirect('/category');
+                } else {
+                    return redirect()->route('cashier.index');
+                }
+            }
+            return redirect()->back()->withInput($request->only('email', 'password', 'remember'))->withErrors([
+                'password' => 'Password Salah',
+            ]);
+        }
     }
 
     public function phone_number()

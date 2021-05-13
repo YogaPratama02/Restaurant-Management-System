@@ -1,14 +1,16 @@
 @extends('layouts.default')
 
+@section('title','Purchase')
+
 @section('content')
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
                 <div class="card mt-3">
-                    <div class="card-header" style="background-color:#90be6d">
+                    <div class="card-header" style="background-color:#97cf6e">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> Purchase
                         </h5>
-                        <a href="{{ route('supplier.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#577590" title="Create Purchase"><i class="fas fa-plus"></i> Create Purchase</a>
+                        <a href="{{ route('supplier.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#F3B949" title="Create Purchase"><i class="fas fa-plus"></i> Create Purchase</a>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered" style="width:100%">

@@ -34,7 +34,7 @@ class CashierController extends Controller
         $html = '';
         foreach ($tables as $tables) {
             $html .= '<div class="col-lg-2 col-md-3 col-sm-2 col-3 p-2">';
-            $html .= '<button class="btn btn-table text-black" data-id="' . $tables->id . '" data-name="' . $tables->name . '" style="background-color: #90be6d; width:60px">
+            $html .= '<button class="btn btn-table text-black" data-id="' . $tables->id . '" data-name="' . $tables->name . '" style="background-color: #97cf6e; width:60px">
             <img class="img-fluid" src="' . url('/images/table.svg') . '" />
             <br>';
             switch ($tables) {
@@ -42,7 +42,7 @@ class CashierController extends Controller
                     $html .= '<span class="badge" style="background-color: #a6a9b6">' . $tables->name . '</span>';
                     break;
                 default:
-                    $html .= '<span class="badge" style="background-color: #ffd384">' . $tables->name . '</span>';
+                    $html .= '<span class="badge" style="background-color: #F3B949">' . $tables->name . '</span>';
                     break;
             }
             $html .= '</button>';
@@ -166,7 +166,7 @@ class CashierController extends Controller
         if ($sale) {
             $sale_id = $sale->id;
             $html['sale'] .= $this->getSaleDetails($sale_id);
-            $html['modal'] .= '<button type="button" data-id="' . $sale->table->id . '" class="btn mejaUpdate text-black" style="background-color: #ffd384;" data-toggle="modal" data-target="#modal-move">
+            $html['modal'] .= '<button type="button" data-id="' . $sale->table->id . '" class="btn mejaUpdate text-black" style="background-color: #F3B949;" data-toggle="modal" data-target="#modal-move">
                                 Move Table
                                 </button>';
             $html['modal'] .= '<div class="modal fade" id="modal-move" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -215,7 +215,7 @@ class CashierController extends Controller
 
         $html .= '<div class="table-responsive-md" style="overflow-y:scroll; height: 400px; border: 1px; solid #343A40">
         <table class="table table-stripped table-white">
-        <thead class="text-white text-left" style="background-color: #90be6d">
+        <thead class="text-white text-left" style="background-color: #97cf6e">
             <tr>
                 <th scope="col">Menu</th>
                 <th scope="col">Qty</th>
@@ -339,9 +339,9 @@ class CashierController extends Controller
         </div>
             ';
             if (auth()->user()->hasRole('super admin|admin|cashier')) {
-                $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-block btn-payment mt-2" style="background-color: #f9c74f">Payment</button>';
+                $html .= '<button data-id="' . $sale_id . '" data-total="' . $sale->total_price . '" class="btn btn-block btn-payment mt-2" style="background-color: #F3B949">Payment</button>';
             } elseif (auth()->User()->hasRole('members')) {
-                $html .= '<button class="btn btn-block mt-2" style="background-color: #ffd384">Harap hubungi cashier untuk transaksi</button>';
+                $html .= '<button class="btn btn-block mt-2" style="background-color: #F3B949">Harap hubungi cashier untuk transaksi</button>';
             }
         } else if ($saleDetail->status == "NoConfirm" && $saleDetail->sale->customer_name == null) {
             $html .= '
@@ -358,7 +358,7 @@ class CashierController extends Controller
                         </tr>
                     </table>
                 ';
-            $html .= '<button data-id="' . $sale_id . '" class="btn btn-block btn-confirm-order" style="background-color: #ffd384">Confirm Order</button>';
+            $html .= '<button data-id="' . $sale_id . '" class="btn btn-block btn-confirm-order" style="background-color: #F3B949">Confirm Order</button>';
         }
         return $html;
     }

@@ -17,8 +17,9 @@
 }
 
 .form-control:focus{
-    border-color: #723dbe;
-    box-shadow: 0 0 0 0.2rem rgba(114,61,190,.25);
+    /* border-color: #723dbe; */
+    border-color: #97cf6e;
+    box-shadow: 0 0 0 0.2rem rgba(67, 241, 134, 0.25);
 }
 
 .forgot-link{
@@ -35,12 +36,12 @@
 }
 
 .login-form a:hover{
-    color: #723dbe;
+    color: #97cf6e;
 }
 
 .btn-custom{
-    background-color: #723dbe;
-    border-color: #723dbe;
+    background-color: #97cf6e;
+    border-color: #97cf6e;
     color: #fff;
     font-size: 15px;
     font-weight: 600;
@@ -51,11 +52,11 @@
 .btn-custom:hover,
 .btn-custom:active,
 .btn-custom:active:focus{
-    background-color: #54229d;
-    border-color: #54229d;
+    background-color: #97cf6e;
+    border-color: #97cf6e;
     color: #fff;
 }
 
 .btn-custom:focus{
-    box-shadow: 0 0 0 0.2rem rgba(114,61,190,.25);
+    box-shadow: 0 0 0 0.2rem rgba(67, 241, 134, 0.25);
 }

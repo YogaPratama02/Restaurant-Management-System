@@ -162,6 +162,7 @@ Route::group(['middleware' => ['role:super admin', 'verified']], function () {
     Route::get('/report/month', 'ReportController@month')->name('report.indexmonth');
     Route::get('/report/datamonth', 'ReportController@dataMonth')->name('report.dataMonth');
     Route::get('/report/menumonth', 'ReportController@menuMonth')->name('report.menuMonth');
+    Route::get('/report/dataDailyCustomers', 'ReportController@dataDailyCustomers')->name('report.dataDailyCustomers');
     Route::get('/month/chart', 'ReportController@month')->name('report.chart');
 
     // report employe

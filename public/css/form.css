@@ -3,14 +3,14 @@
     margin: 0;
 } */
 
-.hehe{
+/* .hehe{
     position: relative;
 }
 
 .hehe img{
     max-width: 100%;
     height: auto;
-}
+} */
 
 .banner-text{
     position: absolute;
@@ -98,13 +98,13 @@
     align-items: center;
     justify-content: start;
     flex-wrap: wrap;
-    background-color: #90be6d;
+    background-color: #97cf6e;
     border-radius: 10px;
     cursor: pointer;
 }
 
 .flex-container > a {
-    background-color: #ffd384;
+    background-color: #F3B949;
     border-radius: 10px;
     width: 28%px;
     height: 50px;
@@ -115,7 +115,7 @@
 }
 
 .voucher {
-    background-color: #ffd384;
+    background-color: #F3B949;
     border-radius: 10px;
     width: 15%;
 }
@@ -176,7 +176,7 @@
 }
 
 .scroll::-webkit-scrollbar-thumb{
-    background-color: #ffd384;
+    background-color: #F3B949;
     border-radius: 6px;
 }
 
@@ -191,7 +191,7 @@
 }
 
 .get_menu::-webkit-scrollbar-thumb{
-    background-color: #ffd384;
+    background-color: #F3B949;
     border-radius: 6px;
 }
 
@@ -201,7 +201,7 @@
 }
 
 .show_menu{
-    background-color: #ffd384;
+    background-color: #F3B949;
 }
 .img_sold{
     position: relative;
@@ -223,7 +223,7 @@
 }
 
 .refresh{
-    background-color: #ffd384;
+    background-color: #F3B949;
 }
 
 .img_menu_show{
@@ -282,7 +282,7 @@
 
 @media only screen and (max-width: 900px) {
     .flex-container > a {
-        background-color: #ffd384;
+        background-color: #F3B949;
         border-radius: 10px;
         width: 28%;
         margin: 6px;

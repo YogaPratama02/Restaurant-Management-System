@@ -1,5 +1,7 @@
 @extends('layouts.default')
 
+@section('title','Daily Report')
+
 @section('content')
 <link type="text/css" rel="stylesheet" href="{{asset('/css/day.css')}}">
     <div class="container">
@@ -12,11 +14,11 @@
                         <input type="text" name="date_end" id="date_end" class="form-control" placeholder="end date.." readonly />
                     </div>
                     <div class="col-md-3 col-sm-4 col-lg-3 col-5">
-                        <button type="button" name="filter" id="filter" class="btn text-black" style="background-color: #90be6d">Filter</button>
-                        <button type="button" name="refresh" id="refresh" class="btn text-black" style="background-color: #90be6d">Refresh</button>
+                        <button type="button" name="filter" id="filter" class="btn text-black" style="background-color: #97cf6e">Filter</button>
+                        <button type="button" name="refresh" id="refresh" class="btn text-black" style="background-color: #97cf6e">Refresh</button>
                     </div>
                     <div class="col-md-3 col-sm-4 col-lg-3 col-5">
-                        <button type="button" class="btn text-black excel" style="background-color: #90be6d">Export To Excel</button>
+                        <button type="button" class="btn text-black excel" style="background-color: #97cf6e">Export To Excel</button>
                     </div>
                 </div>
                 <div class="row">
@@ -83,6 +85,24 @@
                                         <th>No</th>
                                         <th>Menu</th>
                                         <th>Total Sold</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card-body table-responsive">
+                            <table id="customers_daily" class="table hover" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Date</th>
+                                        <th>Customer Name</th>
+                                        <th>Customer Phone</th>
+                                        <th>Table Name</th>
+                                        <th>Total</th>
                                     </tr>
                                 </thead>
                             </table>
@@ -180,6 +200,28 @@ $(document).ready(function(){
         });
     }
 
+    customer_data()
+    function customer_data(date_start = '', date_end='')
+    {
+        var customers = $('#customers_daily').DataTable({
+            responsive: true,
+            serverSide: true,
+            ajax: {
+                url : "{{ route('report.dataDailyCustomers') }}",
+                type: "GET",
+                data: {date_start: date_start, date_end:date_end}
+            },
+            columns: [
+                {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable:false, className: 'dt-head-center'},
+                {data: 'created_at', name: 'created_at', className: 'dt-head-center'},
+                {data: 'customer_name', name: 'customer_name', className: 'dt-head-center'},
+                {data: 'customer_phone', name: 'customer_phone', className: 'dt-head-center'},
+                {data: 'table_id', name: 'table_id', className: 'dt-head-center'},
+                {data: 'total_vatprice', name: 'total_vatprice', className: 'dt-head-center'}
+            ],
+        });
+    }
+
     $('.excel').click(function(){
         var date_start = $('#date_start').val();
         var date_end = $('#date_end').val();
@@ -196,10 +238,12 @@ $(document).ready(function(){
         if(date_start != '' && date_end != ''){
             $('#time').html(date_start).append(' to ', date_end );
             $('#sale_daily').DataTable().destroy();
+            $('#customers_daily').DataTable().destroy();
             $('#menu_daily').DataTable().destroy();
             fecthData(date_start, date_end);
             menu_data(date_start, date_end);
             type_data(date_start, date_end);
+            customer_data(date_start, date_end);
         }else{
             alert('Both date is required');
         }
@@ -210,10 +254,13 @@ $(document).ready(function(){
         $('#date_end').val('');
         $('#time').html('');
         $('#sale_daily').DataTable().destroy();
+        $('#customers_daily').DataTable().destroy();
+        $('#sale_daily').DataTable().destroy();
         $('#menu_daily').DataTable().destroy();
         fecthData();
         type_data();
         menu_data();
+        customer_data();
     });
 });
 </script>

@@ -54,6 +54,31 @@ class ReportController extends Controller
         return view('report.index');
     }
 
+    public function dataDailyCustomers(Request $request)
+    {
+        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
+        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        // $user = Sale::whereBetween('created_at', [$date_start, $date_end])->orderBy('created_at', 'asc')->get();
+        $user = Sale::whereBetween(DB::raw('DATE(created_at)'), array($date_start, $date_end))->orderBy('created_at', 'asc')->get();
+        return DataTables()->of($user)
+            ->addColumn('created_at', function ($user) {
+                $date = date("d M Y", strtotime($user->created_at));
+                return $date;
+            })
+            ->addColumn('table_id', function ($user) {
+                return $user->table->name;
+            })
+            ->addColumn('total_vatprice', function ($user) {
+                $total_vatprice = 'Rp. ';
+                $total_vatprice .= number_format($user->total_vatprice, 0, ',', '.');
+                return $total_vatprice;
+            })
+            ->addIndexColumn()
+            ->removeColumn([])
+            ->rawColumns(['created_at', 'table_id', 'total_vatprice'])
+            ->make(true);
+    }
+
     public function dataDaily(Request $request)
     {
         $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
@@ -314,13 +339,6 @@ class ReportController extends Controller
         //     DB::raw("to_char(created_at, 'YYYY') as month"),
         //     DB::raw("SUM(total) as total")
         // ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->orderByRaw('max(created_at) asc')->get();
-
-        // foreach ($purc as $purc) {
-        //     $html['footer'] = '<tr>
-        //                 <th id="total" colspan="2">Total</th>
-        //                 <td>' . 'Rp. ' . number_format($purc->total, 0, ',', '.') . '</td>
-        //             </tr>';
-        // }
 
         // $detail = Supplier::select(DB::raw('count(name) as count, name'))->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('name')->get();
     }

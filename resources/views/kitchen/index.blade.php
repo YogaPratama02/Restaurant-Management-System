@@ -1,5 +1,7 @@
 @extends('layouts.default')
 
+@section('title','Kitchen')
+
 @section('content')
     <div class="container">
         <div class="row">
@@ -19,7 +21,7 @@
 
 @push('after-script')
 <script type="text/javascript">
-    $('body').on('click', '#ayo', function(data){
+    $('body').on('click', '#confirm', function(data){
         $.ajax({
             url: '/kitchen/update/'+$(this).data('id'),
             method: 'GET',
@@ -31,7 +33,7 @@
             }
         })
     });
-    $('body').on('click', '#cepet', function(data){
+    $('body').on('click', '#waiting', function(data){
         $.ajax({
             url: '/kitchen/again/'+$(this).data('id'),
             method: 'GET',

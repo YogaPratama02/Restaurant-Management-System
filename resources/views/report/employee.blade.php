@@ -1,5 +1,7 @@
 @extends('layouts.default')
 
+@section('title','Employee Report')
+
 @section('content')
     <div class="container">
         <div class="card-body">
@@ -11,8 +13,8 @@
                     <input type="text" name="date_end" id="date_end" class="form-control text-center" placeholder="end date.." readonly />
                 </div>
                 <div class="col-md-4 col-sm-4 col-lg-4 col-6">
-                    <button type="button" name="filter" id="filter" class="btn text-black" style="background-color: #90be6d">Filter</button>
-                    <button type="button" name="refresh" id="refresh" class="btn text-black" style="background-color: #90be6d">Refresh</button>
+                    <button type="button" name="filter" id="filter" class="btn text-black" style="background-color: #97cf6e">Filter</button>
+                    <button type="button" name="refresh" id="refresh" class="btn text-black" style="background-color: #97cf6e">Refresh</button>
                 </div>
             </div>
             <div class="row">
