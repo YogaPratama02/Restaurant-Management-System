@@ -57,12 +57,12 @@ class LoginController extends Controller
             'email.email' => 'Email tidak valid',
             'email.exists' => "Email tidak ada",
             'password.required' => 'Password harus diisi',
-            'password.min' => 'Password minimal 10 karakter',
+            'password.min' => 'Password minimal 8 karakter',
         ];
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
-            'password' => 'required|min:10'
+            'password' => 'required|min:8'
         ], $messages);
 
         if ($validator->fails()) {
