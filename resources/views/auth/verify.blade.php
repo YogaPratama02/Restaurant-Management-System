@@ -14,7 +14,8 @@
             @csrf
             <button type="submit" class="btn btn-custom btn-block text-uppercase rounded-pill btn-lg">{{ __('Verify Your Email Address') }}</button>
         </form>
-    </form>
+    {{-- </form> --}}
+    </div>
 </div>
 {{-- <div class="container">
     <div class="row justify-content-center mt-5">

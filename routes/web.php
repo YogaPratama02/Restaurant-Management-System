@@ -18,7 +18,7 @@ use Facade\FlareClient\Http\Response;
 Route::get('/', 'HomeController@show');
 
 Auth::routes(['register' => true, 'verify' => true]);
-
+Route::post('/send-email', 'SendMailController@sendSignUpEmail')->name('send.mail');
 // Route::get()
 
 // Route::get('/home', 'HomeController@index')->name('dashboard');
