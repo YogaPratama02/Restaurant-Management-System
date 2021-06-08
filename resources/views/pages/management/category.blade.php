@@ -36,7 +36,7 @@
             responsive: true,
             processing: true,
             serverSide: true,
-            ajax: "{{ route('pages.management.category') }}",
+            ajax: "{{ route('category.data') }}",
             columns: [
                 {data: 'DT_RowIndex', name: 'id'},
                 {data: 'name', name: 'name'},

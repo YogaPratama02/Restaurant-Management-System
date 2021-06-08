@@ -2,122 +2,63 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Category;
-use Carbon\Carbon;
-use App\Menu;
+use Illuminate\Http\Request;
 use DataTables;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class CategoryController extends Controller
 {
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(Request $request)
+    public function index()
     {
-
-        $categories = Category::all();
         return view('pages.management.category');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         $categories = new Category();
         return view('pages.management.form', compact('categories'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|unique:categories|max:255'
+        $this->validate($request, [
+            'name' => ['required']
         ]);
-        $imageName = "noimage.png";
-        $category = new Category;
-        $category->name = $request->name;
-        $current = new Carbon;
-        $current->timezone('GMT+7');
-        $category->created_at = $current;
-        $category->updated_at = $current;
-        $category->save();
-        return json_encode(true);
+        $model = Category::create([
+            'name' => $request->name
+        ]);
+        return response()->json($model);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
         $categories = Category::findOrFail($id);
         return view('pages.management.form', compact('categories'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'name' => 'required|max:255'
+        $this->validate($request, [
+            'name' => ['required']
         ]);
-        $category = Category::findOrFail($id);
+        $model = Category::findOrFail($id);
 
-        $category->name = $request->name;
-        $current = new Carbon;
-        $current->timezone('GMT+7');
-        $category->updated_at = $current;
-        $category->save();
-        return json_encode(true);
+        $model->update([
+            'name' => $request->name,
+        ]);
+
+        return response()->json($model);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
-        $categories = Category::findOrFail($id);
-        $categories->delete();
+        Category::findOrFail($id)->delete();
+        return response()->json(true);
     }
 
-    public function dataTable()
+    public function data()
     {
-        $categories = Category::all();
+        $categories = Category::get();
         return DataTables()->of($categories)
             ->addColumn('action', function ($categories) {
                 return view('layouts.action', [
@@ -127,7 +68,8 @@ class CategoryController extends Controller
                 ]);
             })
             ->addIndexColumn()
-            ->rawColumns(['action'])
+            ->removeColumn([])
+            ->rawColumns([])
             ->make(true);
     }
 }

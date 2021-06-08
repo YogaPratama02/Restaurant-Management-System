@@ -73,9 +73,15 @@ Route::group(['middleware' => ['role:super admin|admin', 'verified']], function 
     Route::get('/management', function () {
         return view('pages.management.index');
     });
-    Route::resource('category', 'CategoryController');
+
+    // category
     Route::get('/category', 'CategoryController@index')->name('category.index');
-    Route::get('/management/create', 'CategoryController@dataTable')->name('pages.management.category');
+    Route::get('/category/create', 'CategoryController@create')->name('category.create');
+    Route::post('/category/store', 'CategoryController@store')->name('category.store');
+    Route::get('/category/edit/{id}', 'CategoryController@edit')->name('category.edit');
+    Route::put('/category/update/{id}', 'CategoryController@update')->name('category.update');
+    Route::delete('category/delete/{id}', 'CategoryController@destroy')->name('category.destroy');
+    Route::get('/category/data', 'CategoryController@data')->name('category.data');
 
     // User
     Route::get('/user', 'UserController@index')->name('user.index');

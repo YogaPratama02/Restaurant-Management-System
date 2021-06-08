@@ -23,7 +23,34 @@ class UserSeeder extends Seeder
             'phone_number' => '081381517194',
             'password' => bcrypt('admin12345'),
         ]);
-        $admin->assignRole('super admin');
+        $admin->assignRole('admin');
+
+        $super_admin = User::create([
+            'name' => 'super admin',
+            'email' => 'superadmin@gmail.com',
+            'email_verified_at' => date('Y-m-d H:i:s'),
+            'phone_number' => '081381518792',
+            'password' => bcrypt('superadmin12345'),
+        ]);
+        $super_admin->assignRole('super admin');
+
+        $cashier = User::create([
+            'name' => 'cashier',
+            'email' => 'cashier@gmail.com',
+            'email_verified_at' => date('Y-m-d H:i:s'),
+            'phone_number' => '081381519082',
+            'password' => bcrypt('cashier12345'),
+        ]);
+        $cashier->assignRole('cashier');
+
+        $members = User::create([
+            'name' => 'members',
+            'email' => 'members@gmail.com',
+            'email_verified_at' => date('Y-m-d H:i:s'),
+            'phone_number' => '081381511342',
+            'password' => bcrypt('members12345'),
+        ]);
+        $members->assignRole('members');
         DB::table('categories')->insert([
             [
                 'name' => 'Breakfast'

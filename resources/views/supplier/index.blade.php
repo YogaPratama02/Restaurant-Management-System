@@ -37,15 +37,15 @@
 <script type="text/javascript">
     $('#datatable').DataTable({
         responsive: true,
-        processing: true,
         serverSide: true,
+        scrollX: true,
         ajax: "{{ route('supplier.data') }}",
         columns: [
             {data: 'DT_RowIndex', name: 'id'},
             {data: 'date', name: 'date'},
             {data: 'name', name: 'name'},
             {data: 'total', name: 'total'},
-            {data: 'user.name', name: 'user.name'},
+            {data: 'user_id', name: 'user_id'},
             {data: 'action', name: 'action', orderable: false, searchable: false, width: '30%'}
         ]
     });

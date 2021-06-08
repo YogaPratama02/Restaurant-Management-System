@@ -1,7 +1,7 @@
 {!! Form::model($categories, [
     'route' => $categories->exists ? ['category.update', $categories->id] : 'category.store',
     'method' => $categories->exists ? 'PUT' : 'POST',
-    'class' => 'cobaaja',
+    'class' => 'cobaaja'
 ]) !!}
 
     <div class="modal-body">

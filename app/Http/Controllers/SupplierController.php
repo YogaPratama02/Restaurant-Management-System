@@ -72,7 +72,7 @@ class SupplierController extends Controller
 
     public function dataTable()
     {
-        $suppliers = Supplier::with('user')->get();
+        $suppliers = Supplier::get();
         return DataTables()->of($suppliers)
             ->addColumn('action', function ($suppliers) {
                 return view('supplier.supplieraction', [
@@ -90,8 +90,11 @@ class SupplierController extends Controller
                 $total .= number_format($suppliers->total, 0, ',', '.');
                 return $total;
             })
+            ->addColumn('user_id', function ($suppliers) {
+                return $suppliers->user->name;
+            })
             ->addIndexColumn()
-            ->rawColumns(['action', 'total', 'date'])
+            ->rawColumns(['action', 'total', 'date', 'user_id'])
             ->make(true);
     }
 }
