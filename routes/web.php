@@ -99,11 +99,12 @@ Route::group(['middleware' => ['role:super admin|admin', 'verified']], function 
     Route::post('/menu/store', 'MenuController@store')->name('menu.store');
     Route::get('/edit/{id}', 'MenuController@edit')->name('menu.edit');
     Route::put('update/{id}', 'MenuController@update')->name('menu.update');
+    Route::get('show/{id}', 'MenuController@show')->name('menu.show');
     Route::delete('delete/{id}', 'MenuController@destroy')->name('menu.destroy');
 
     // table
     Route::get('/table', 'TableController@index')->name('table.index');
-    Route::get('/table/haha', 'TableController@dataTable')->name('table.coba');
+    Route::get('/table/data', 'TableController@dataTable')->name('table.data');
     Route::get('/table/create', 'TableController@create')->name('table.create');
     Route::post('/table/store', 'TableController@store')->name('table.store');
     Route::get('/table/edit/{id}', 'TableController@edit')->name('table.edit');

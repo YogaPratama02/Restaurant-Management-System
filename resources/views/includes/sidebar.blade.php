@@ -33,7 +33,7 @@
             @if(Auth::user()->hasRole('super admin|admin|cashier|members'))
             <a href="{{route('cashier.index')}}" class="nav-link {{(request()->is('cashier*')) ? 'active' : '' }}">
               <i class="fas fa-cash-register" style="margin-left: -0.15rem"></i>
-                <p>Cashier</p>
+                <p>@if(Auth::user()->hasRole('members')) Order @else Cashier @endif</p>
             </a>
             @endif
         </li>

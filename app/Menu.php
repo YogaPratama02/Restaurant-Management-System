@@ -8,7 +8,7 @@ class Menu extends Model
 {
     //
     protected $fillable = [
-        'name', 'hpp', 'price', 'image', 'discount', 'category_id'
+        'name', 'hpp', 'price', 'image', 'discount', 'category_id', 'description'
     ];
 
     protected $hidden = [

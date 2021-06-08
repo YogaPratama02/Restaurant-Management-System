@@ -10,7 +10,7 @@
                     <div class="card-header" style="background-color:#97cf6e">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-hamburger"></i> Menu
                         </h5>
-                        <a href="{{ route('menu.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#F3B949" title="Create Menu"><i class="fas fa-plus text-white"></i> Create Menu</a>
+                        <a href="{{ route('menu.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#F3B949" name="Create Menu"><i class="fas fa-plus text-white"></i> Create Menu</a>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered table-responsive" style="width:100%">
@@ -20,7 +20,6 @@
                                     <th>Name</th>
                                     <th>hpp</th>
                                     <th>Price</th>
-                                    <th>Image</th>
                                     <th>Discount</th>
                                     <th>Category</th>
                                     <th>Action</th>
@@ -30,28 +29,26 @@
                     </div>
                 </div>
             </div>
-            @include('layouts.modal')
         </div>
     </div>
 @endsection
 
 @push('after-script')
+
     <script type="text/javascript">
 
         $('#datatable').DataTable({
             responsive: true,
-            processing: true,
             serverSide: true,
             ajax: "{{ route('table.menu') }}",
             columns: [
                 {data: 'DT_RowIndex', name: 'id'},
                 {data: 'name', name: 'name'},
-                {data: 'hpp', name: 'hpp'},
-                {data: 'price', name: 'price'},
-                {data: 'image', name: 'image'},
+                {data: 'hpp', name: 'hpp', width : '10%'},
+                {data: 'price', name: 'price', width : '10%'},
                 {data: 'discount', name: 'discount'},
                 {data: 'category_id', name: 'category_id'},
-                {data: 'action', name: 'action', orderable: false, searchable: false, width : '70%'}
+                {data: 'action', name: 'action', orderable: false, searchable: false, }
             ]
         });
 
@@ -61,7 +58,7 @@
 
             var me = $(this),
                 url = me.attr('href'),
-                title = me.attr('title');
+                title = me.attr('name');
 
             $('.modal-title').text(title);
             $.ajax({
@@ -75,7 +72,7 @@
             $('#modal-form').modal('show');
         });
 
-        $('body').on('submit', '#coba' ,function (event) {
+        $('body').on('submit', '.tabel-form1' ,function (event) {
             event.preventDefault();
             var form = $('#modal-form form'),
                 url = form.attr('action'),

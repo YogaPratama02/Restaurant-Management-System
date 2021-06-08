@@ -7,6 +7,7 @@
 <!-- Bootstrap 4 -->
 <script src="{{asset('/dashboard/plugins/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
 <script src="{{asset('/dashboard/plugins/sparklines/sparkline.js')}} "></script>
+<script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
 <!-- overlayScrollbars -->
 <script src="{{asset('/dashboard/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js')}} "></script>
 <!-- AdminLTE App -->

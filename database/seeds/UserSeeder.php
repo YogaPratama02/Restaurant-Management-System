@@ -107,9 +107,11 @@ class UserSeeder extends Seeder
 
             $id = DB::table('menus')->insertGetId([
                 'name' => $faker->foodName(),
+                'description' => 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsam, deserunt?',
                 'hpp' => $faker->numberBetween(15000, 35000),
                 'price' => $faker->numberBetween(20000, 50000),
-                'image' => $faker->imageUrl($width = 120, $height = 120),
+                // 'image' => $faker->imageUrl(120, 120),
+                'image' => 'uploads/menus/image_example.jpg',
                 'discount' => $faker->numberBetween(1, 10),
                 'category_id' => $category
             ]);

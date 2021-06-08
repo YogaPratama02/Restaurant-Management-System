@@ -18,8 +18,9 @@ class MenuController extends Controller
     public function create()
     {
         $model = new Menu();
-        $model['categories'] = Category::all()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->pluck('name', 'id');
-        return view('pages.menu.formmenu', ['model' => $model]);
+        // $model['categories'] = Category::all()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->pluck('name', 'id');
+        $categories = Category::get();
+        return view('pages.menu.formmenu', ['model' => $model, 'categories' => $categories]);
     }
 
     public function store(Request $request)
@@ -29,23 +30,24 @@ class MenuController extends Controller
             'hpp' => 'required|numeric',
             'price' => 'required|numeric',
             'discount' => 'required|numeric',
-            'category_id' => 'required|numeric'
+            'category_id' => 'required|numeric',
+            'description' => 'required',
         ]);
-
-        $imageName = "noimage.png";
-        if ($request->image) {
-            $request->validate([
-                'image' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5000'
-            ]);
-            $imageName = date('mdYHis') . uniqid() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move(public_path('menu_images'), $imageName);
+        if ($request->file('image') != null) {
+            $directory = '/uploads/menus/';
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+            $image = $directory . $filename;
+            $request->image->move(public_path($directory), $filename);
+        } else {
+            $image = '/images/no-image.png';
         }
 
         $menus = new Menu();
         $menus->name = $request->name;
+        $menus->description = $request->description;
         $menus->hpp = $request->hpp;
         $menus->price = $request->price;
-        $menus->image = $imageName;
+        $menus->image = $image;
         $menus->discount = $request->discount;
         $menus->category_id = $request->category_id;
         $current = new Carbon;
@@ -53,15 +55,16 @@ class MenuController extends Controller
         $menus->created_at = $current;
         $menus->updated_at = $current;
         $menus->save();
-        return json_encode(true);
+        return json_encode($menus);
     }
 
 
     public function edit($id)
     {
         $model = Menu::find($id);
-        $model['categories'] = Category::all()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->pluck('name', 'id');
-        return view('pages.menu.formmenu', ['model' => $model]);
+        // $model['categories'] = Category::all()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->pluck('name', 'id');
+        $categories = Category::get();
+        return view('pages.menu.formmenu', ['model' => $model, 'categories' => $categories]);
     }
 
     public function update(Request $request, $id)
@@ -76,33 +79,40 @@ class MenuController extends Controller
 
         $menus = Menu::find($id);
 
-        $imageName = "noimage.png";
-        if ($request->image) {
-            $request->validate([
-                'image' => 'nullable|file|image|mimes:jpeg,png,jpg|max:5000'
-            ]);
-            $imageName = date('mdYHis') . uniqid() . '.' . $request->image->getClientOriginalExtension();
-            $request->image->move(public_path('menu_images'), $imageName);
+        if ($request->file('image') != null) {
+            $directory = '/uploads/menus/';
+            $filename = time() . '.' . $request->image->getClientOriginalExtension();
+            $image = $directory . $filename;
+            $request->image->move(public_path($directory), $filename);
+        } else {
+            $image = $menus->image;
         }
 
         // save information to menus table
         $menus->name = $request->name;
+        $menus->description = $request->description;
         $menus->hpp = $request->hpp;
         $menus->price = $request->price;
-        $menus->image = $imageName;
+        $menus->image = $image;
         $menus->discount = $request->discount;
         $menus->category_id = $request->category_id;
         $current = new Carbon;
         $current->timezone('GMT+7');
         $menus->updated_at = $current;
         $menus->save();
-        return json_encode(true);
+        return json_encode($menus);
     }
 
     public function destroy($id)
     {
         $model = Menu::findOrFail($id);
         $model->delete();
+    }
+
+    public function show($id)
+    {
+        $model = Menu::findOrFail($id);
+        return view('pages.menu.formdetail', ['model' => $model]);
     }
 
     public function dataTable()
@@ -113,13 +123,9 @@ class MenuController extends Controller
                 return view('pages.menu.menuaction', [
                     'menus' => $menus,
                     'url_edit' => route('menu.edit', $menus->id),
-                    'url_destroy' => route('menu.destroy', $menus->id)
+                    'url_destroy' => route('menu.destroy', $menus->id),
+                    'url_show' => route('menu.show', $menus->id),
                 ]);
-            })
-            ->addColumn('image', function ($menus) {
-                $url = asset('menu_images/' . $menus->image);
-                $image = '<img src="' . $url . '" width="110px" height="110px"/>';
-                return $image;
             })
             ->editColumn('price', function ($menus) {
                 $price = 'Rp. ';

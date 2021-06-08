@@ -37,7 +37,7 @@
             responsive: true,
             processing: true,
             serverSide: true,
-            ajax: "{{ route('table.coba') }}",
+            ajax: "{{ route('table.data') }}",
             columns: [
                 {data: 'DT_RowIndex', name: 'id', width: '10%'},
                 {data: 'name', name: 'name',width: '25%'},
