@@ -31,7 +31,6 @@ class MenuController extends Controller
             'price' => 'required|numeric',
             'discount' => 'required|numeric',
             'category_id' => 'required|numeric',
-            'description' => 'required',
         ]);
         if ($request->file('image') != null) {
             $directory = '/uploads/menus/';

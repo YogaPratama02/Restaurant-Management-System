@@ -64,7 +64,7 @@ class CashierController extends Controller
                     <div class="ml-1 mt-2">
                         <button class="btn btn-outline-secondary btn-menu text-left show_menus"  data-id="' . $menu->id . '" disabled>
                             <div class="img_sold">
-                                <img class="img_menu_show" src="' . url('/menu_images/' . $menu->image) . '">
+                                <img class="img_menu_show" src="' .  $menu->image . '">
                                 <div class="text_sold"><p>sold out</p></div>
                             </div>
                             <div class="">
@@ -78,7 +78,7 @@ class CashierController extends Controller
                     $html .= '
                     <div class="ml-1 mt-2 show_menus">
                         <button class="btn btn-outline-secondary btn-menu text-left show_menus" data-id="' . $menu->id . '">
-                            <img class="rounded img_menu_show" src="' . url('/menu_images/' . $menu->image) . '" >
+                            <img class="rounded img_menu_show" src="' . $menu->image . '" >
                             <p class="font-weight-bold text_menu"> ' . $menu->name . '</p>
                             <p>Rp' . number_format($menu->price) . '</p>
                             </div>
