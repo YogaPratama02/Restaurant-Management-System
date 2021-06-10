@@ -10,6 +10,8 @@ use App\Exports\SaleReportExport;
 use App\Exports\SaleDayExport;
 use Maatwebsite\Excel\Facades\Excel;
 use DataTables;
+use Illuminate\Support\Facades\Auth;
+use App\User;
 
 class ReportController extends Controller
 {
@@ -24,26 +26,29 @@ class ReportController extends Controller
             $html['credit'] = '';
 
             $sale_cash = DB::table('sales')->select([
-                DB::raw("to_char(created_at, 'YYYY') as month,
-                SUM(total_vatprice) as total_vatprice")
-            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'cash')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month,
+                SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'cash')->groupBy('month')->orderBy('createdAt')->get();
             foreach ($sale_cash as $sale) {
                 $html['cash'] .= 'Rp. ' . number_format($sale->total_vatprice, 0, ',', '.');
             }
 
             $saleBank = DB::table('sales')->select([
-                DB::raw("to_char(created_at, 'YYYY') as month,
-                SUM(total_vatprice) as total_vatprice")
-            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'bank_transfer')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month,
+                SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'bank_transfer')->groupBy('month')->orderBy('createdAt')->get();
 
             foreach ($saleBank as $saleBank) {
                 $html['transfer'] .= 'Rp. ' . number_format($saleBank->total_vatprice, 0, ',', '.');
             }
 
             $saleCard = DB::table('sales')->select([
-                DB::raw("to_char(created_at, 'YYYY') as month,
-                SUM(total_vatprice) as total_vatprice")
-            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'payment_card')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month,
+                SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'payment_card')->groupBy('month')->orderBy('createdAt')->get();
 
             foreach ($saleCard as $saleCard) {
                 $html['credit'] .= 'Rp. ' . number_format($saleCard->total_vatprice, 0, ',', '.');
@@ -84,11 +89,12 @@ class ReportController extends Controller
         $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
         $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
         $sale = DB::table('sales')->select(
-            DB::raw("to_char(created_at, 'dd-mm-YYYY') as date,
+            DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y') as date,
             SUM(total_hpp) as total_hpp,
             SUM(total_price) as total_price,
             SUM(total_vatprice) as total_vatprice"),
-        )->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('date')->orderByRaw('max(created_at) asc')->get();
+            DB::raw('max(created_at) as createdAt')
+        )->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('date')->orderBy('createdAt')->get();
         return DataTables()->of($sale)
             ->addColumn('date', function ($sale) {
                 $date = date("d M Y", strtotime($sale->date));
@@ -121,10 +127,11 @@ class ReportController extends Controller
         $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
         $sale = DB::table('sales')->select([
             DB::raw(
-                "to_char(created_at, 'YYYY') as month,
+                "DATE_FORMAT(created_at, '%Y') as month,
             (CASE WHEN payment_type = 'cash' THEN SUM(total_vatprice) WHEN payment_type = 'bank_transfer' THEN SUM(total_vatprice) WHEN payment_type = 'payment_card' THEN SUM(total_vatprice) END) as total_cash",
-            )
-        ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->groupBy('payment_type')->orderByRaw('max(created_at) asc')->get();
+            ),
+            DB::raw('max(created_at) as createdAt')
+        ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->groupBy('payment_type')->orderBy('createdAt')->get();
         return DataTables()->of($sale)
             ->addColumn('cash', function ($sale) {
                 $price = 'Rp. ';
@@ -172,9 +179,10 @@ class ReportController extends Controller
             $html['card'] = '';
 
             $sale_cash = DB::table('sales')->select([
-                DB::raw("to_char(created_at, 'YYYY') as year,
-                        SUM(total_vatprice) as total_vatprice")
-            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'cash')->groupBy(DB::raw("to_char(created_at, 'YYYY')"))->orderByRaw('max(created_at) asc')->get();
+                DB::raw("DATE_FORMAT(created_at, '%Y') as year,
+                        SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'cash')->groupBy(DB::raw("DATE_FORMAT(created_at, '%Y')"))->orderBy('createdAt')->get();
             $total_cash = $sale_cash->sum('total_vatprice');
 
             // foreach ($sale_cash as $sale) {
@@ -183,17 +191,19 @@ class ReportController extends Controller
             // dd($html['cash']);
 
             $sale_bank = Sale::select([
-                DB::raw("to_char(created_at, 'YYYY') as month,
-                SUM(total_vatprice) as total_vatprice")
-            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'bank_transfer')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month,
+                SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'bank_transfer')->groupBy('month')->orderBy('createdAt')->get();
             $total_bank = $sale_bank->sum('total_vatprice');
 
             $html['bank'] .= 'Rp. ' . number_format($total_bank, 0, ',', '.');
 
             $sale_card = Sale::select([
-                DB::raw("to_char(created_at, 'YYYY') as month,
-                SUM(total_vatprice) as total_vatprice")
-            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'payment_card')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+                DB::raw("DATE_FORMAT(created_at, '%Y') as month,
+                SUM(total_vatprice) as total_vatprice"),
+                DB::raw('max(created_at) as createdAt')
+            ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->where('payment_type', 'payment_card')->groupBy('month')->orderBy('createdAt')->get();
             $total_card = $sale_card->sum('total_vatprice');
 
             $html['card'] .= 'Rp. ' . number_format($total_card, 0, ',', '.');
@@ -201,9 +211,10 @@ class ReportController extends Controller
         }
         // Graphic
         $count_month = DB::table('sales')->select([
-            DB::raw("to_char(created_at, 'mm-YYYY') as month,
-            SUM(total_vatprice) as total_vatprice")
-        ])->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+            DB::raw("DATE_FORMAT(created_at, '%m-%Y') as month,
+            SUM(total_vatprice) as total_vatprice"),
+            DB::raw('max(created_at) as createdAt')
+        ])->groupBy('month')->orderBy('createdAt')->get();
         $month_name = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dec'];
         $bulan = [];
         $data = [];
@@ -224,12 +235,13 @@ class ReportController extends Controller
         $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
         $sale = DB::table('sales')->select([
             DB::raw(
-                "to_char(created_at, 'YYYY-mm') as month,
+                "DATE_FORMAT(created_at, '%Y-%m') as month,
                 SUM(total_hpp) as total_hpp,
                 SUM(total_price) as total_price,
                 SUM(total_vatprice) as total_vatprice"
-            )
-        ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+            ),
+            DB::raw('max(created_at) as createdAt')
+        ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->orderBy('createdAt')->get();
         return DataTables()->of($sale)
             ->addColumn('date', function ($sale) {
                 $date = date("M Y", strtotime($sale->month));
@@ -290,11 +302,19 @@ class ReportController extends Controller
         $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
         $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
 
+
+        // $sales = Sale::select(DB::raw('count(user_id) as count, user_id'))->groupBy('user_id')->whereBetween('updated_at', [$date_start, $date_end])->where('sale_status', 'paid')->where(function ($sale) {
+        //     $sale->whereHas('user', function ($sale) {
+        //         return $sale->role('cashier');
+        //     });
+        // })->get();
+
         $sales = DB::table('sales')->join('users', 'users.id', '=', 'sales.user_id')->select(
             'users.id as id',
             'users.name as name',
             DB::raw("count(users.name) as count")
-        )->groupBy('users.id')->whereBetween(DB::raw('DATE(sales.created_at)'), [$date_start, $date_end])->where('sales.sale_status', 'paid')->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')->join('roles', 'model_has_roles.role_id', '=', 'roles.id')->where('roles.name', '=', 'cashier')->get();
+        )->groupBy('id')->whereBetween(DB::raw('DATE(sales.created_at)'), [$date_start, $date_end])->where('sales.sale_status', 'paid')->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')->join('roles', 'model_has_roles.role_id', '=', 'roles.id')->where('roles.name', '=', 'cashier')->get();
+        // $sales = Auth::user()->Role('cashiers')->whereBetween(DB::raw('DATE(sales.created_at)'), [$date_start, $date_end]);
         return DataTables()->of($sales)
             ->addColumn('employee_name', function ($sales) {
                 return $sales->name;
@@ -318,9 +338,10 @@ class ReportController extends Controller
         $date_start = date("Y-m-d", strtotime($request->date_start));
         $date_end = date("Y-m-d", strtotime($request->date_end));
         $purchase = Supplier::select([
-            DB::raw("to_char(created_at, 'YYYY-mm') as month"),
-            DB::raw("SUM(total) as total")
-        ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+            DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
+            DB::raw("SUM(total) as total"),
+            DB::raw('max(created_at) as createdAt')
+        ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->orderBy('createdAt')->get();
         return DataTables()->of($purchase)
             ->addColumn('month', function ($purchase) {
                 return date("M Y", strtotime($purchase->month));
@@ -401,11 +422,12 @@ class ReportController extends Controller
     public function member(Request $request)
     {
         if ($request->ajax()) {
-            $member = DB::table('users')->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')->select(
-                'users.id as id',
-                'users.name as name',
-                'users.email as email'
-            )->groupBy('users.id')->join('roles', 'model_has_roles.role_id', '=', 'roles.id')->where('roles.name', '=', 'members')->get();
+            // $member = DB::table('users')->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')->select(
+            //     'users.id as id',
+            //     'users.name as name',
+            //     'users.email as email'
+            // )->groupBy('users.id')->join('roles', 'model_has_roles.role_id', '=', 'roles.id')->where('roles.name', '=', 'members')->get();
+            $member = Auth::user()->Role('members');
 
             return DataTables()->of($member)
                 ->addColumn('name', function ($member) {

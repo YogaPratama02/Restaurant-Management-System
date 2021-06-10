@@ -9,7 +9,7 @@
 <div class="modal-body">
     <div class="form-group">
         <a href="#" data-lightbox="roadtrip">
-            <img src="{{$model->image}}" alt="{{$model->image}}" class="screenshot">
+            <img src="{{asset($model->image)}}" alt="{{asset($model->image)}}" class="screenshot">
         </a>
     </div>
     <div class="form-group">

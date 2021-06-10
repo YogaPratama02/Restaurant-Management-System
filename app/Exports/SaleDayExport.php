@@ -24,27 +24,31 @@ class SaleDayExport implements FromView
     public function view(): View
     {
         $sale = Sale::select([
-            DB::raw("to_char(created_at, 'dd-mm-YYYY') as date"),
+            DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y') as date"),
             DB::raw("SUM(total_hpp) as total_hpp"),
             DB::raw("SUM(total_price) as total_price"),
             DB::raw("SUM(total_vatprice) as total_vatprice"),
-        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->groupBy('date')->orderByRaw('max(created_at) asc')->get();
+            DB::raw('max(created_at) as createdAt')
+        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->groupBy('date')->orderBy('createdAt')->get();
         $total = $sale->sum('total_vatprice');
 
         $saleCash = Sale::select([
-            DB::raw("to_char(created_at, 'mm') as month"),
+            DB::raw("DATE_FORMAT(created_at, '%m') as month"),
             DB::raw("SUM(total_vatprice) as total_vatprice"),
-        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->where('payment_type', 'cash')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+            DB::raw('max(created_at) as createdAt')
+        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->where('payment_type', 'cash')->groupBy('month')->orderBy('createdAt')->get();
 
         $saleBank = Sale::select([
-            DB::raw("to_char(created_at, 'mm') as month"),
+            DB::raw("DATE_FORMAT(created_at, '%m') as month"),
             DB::raw("SUM(total_vatprice) as total_vatprice"),
-        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->where('payment_type', 'bank_transfer')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+            DB::raw('max(created_at) as createdAt')
+        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->where('payment_type', 'bank_transfer')->groupBy('month')->orderBy('createdAt')->get();
 
         $saleCredit = Sale::select([
-            DB::raw("to_char(created_at, 'mm') as month"),
+            DB::raw("DATE_FORMAT(created_at, '%m') as month"),
             DB::raw("SUM(total_vatprice) as total_vatprice"),
-        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->where('payment_type', 'payment_card')->groupBy('month')->orderByRaw('max(created_at) asc')->get();
+            DB::raw('max(created_at) as createdAt')
+        ])->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->where('payment_type', 'payment_card')->groupBy('month')->orderBy('createdAt')->get();
 
         $saleDetail = DB::table('sale_details')->selectRaw('menu_name, SUM(quantity) as count')->whereBetween(DB::raw('DATE(created_at)'), [$this->date_start, $this->date_end])->groupBy('menu_name')->get();
 
