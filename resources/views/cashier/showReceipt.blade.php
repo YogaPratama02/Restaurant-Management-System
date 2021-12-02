@@ -11,7 +11,7 @@
         <h3 id="restaurant-name">{{ __("Rajapala Coffee") }}</h3>
     </div>
     <div class="receipt text-center" style="text-align: center;">
-        <p>JL. KH Ahmad Dalan No. 18, Kebayboran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta,121 30</p>
+        <p>Jl Untung Surapati, Belakang komplek Perumahan Pandawa</p>
         <p>Tel: 473-XXXX-XXXX</p>
     </div>
     <div class="date">

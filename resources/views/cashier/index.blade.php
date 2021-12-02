@@ -248,7 +248,7 @@
                         'saleDetail_id': SaleDe,
                         'note' : note
                     },
-                    url: '/cashier/update/',
+                    url: "{{route('cashier.update')}}",
                     success: function(data){
                         $('#order').html(data);
                     },

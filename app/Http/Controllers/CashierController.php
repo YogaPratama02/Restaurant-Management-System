@@ -145,7 +145,6 @@ class CashierController extends Controller
         $sale->save();
 
         $inventmenus = InventoryMenu::where('menu_id', $menu->id)->get();
-        // dd($inventmenus);
         foreach ($inventmenus as $inventmenu) {
             $invent = Inventory::find($inventmenu->inventory_id);
             $save = $invent->update([
@@ -499,6 +498,7 @@ class CashierController extends Controller
         }
         $saleDetail_id = $request->saleDetail_id;
         $saleDetail = SaleDetail::find($saleDetail_id);
+
         $saleDetail->note = $string;
         $saleDetail->save();
         $sale_id = $saleDetail->sale_id;
