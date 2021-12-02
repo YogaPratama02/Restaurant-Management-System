@@ -35,7 +35,7 @@ class CashierController extends Controller
         foreach ($tables as $tables) {
             $html .= '<div class="col-lg-2 col-md-3 col-sm-2 col-3 p-2">';
             $html .= '<button class="btn btn-table text-black" data-id="' . $tables->id . '" data-name="' . $tables->name . '" style="background-color: #97cf6e; width:60px">
-            <img class="img-fluid" src="' . url('/images/table.svg') . '" />
+            <img class="img-fluid" src="' . asset('/images/table.svg') . '" />
             <br>';
             switch ($tables) {
                 case ($tables->status == 'unvailable'):
