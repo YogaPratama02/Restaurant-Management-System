@@ -23,7 +23,7 @@ class MenuSeeder extends Seeder
                 'hpp' => $faker->numberBetween(15000, 35000),
                 'price' => $faker->numberBetween(20000, 50000),
                 // 'image' => $faker->imageUrl(120, 120),
-                'image' => 'uploads/menus/image_example.jpg',
+                'image' => env('APP_URL_IMAGE') . 'uploads/menus/image_example.jpg',
                 'discount' => $faker->numberBetween(1, 10),
                 'category_id' => $category
             ]);

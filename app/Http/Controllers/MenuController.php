@@ -33,7 +33,7 @@ class MenuController extends Controller
             'category_id' => 'required|numeric',
         ]);
         if ($request->file('image') != null) {
-            $directory = '/uploads/menus/';
+            $directory = env('APP_URL_IMAGE') . '/uploads/menus/';
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
             $image = $directory . $filename;
             $request->image->move(public_path($directory), $filename);
@@ -79,7 +79,7 @@ class MenuController extends Controller
         $menus = Menu::find($id);
 
         if ($request->file('image') != null) {
-            $directory = '/uploads/menus/';
+            $directory = env('APP_URL_IMAGE') . '/uploads/menus/';
             $filename = time() . '.' . $request->image->getClientOriginalExtension();
             $image = $directory . $filename;
             $request->image->move(public_path($directory), $filename);
