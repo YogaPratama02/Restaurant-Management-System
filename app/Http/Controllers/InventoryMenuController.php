@@ -21,7 +21,7 @@ class InventoryMenuController extends Controller
     {
         $model = new InventoryMenu();
         $model['menus'] = Menu::all()->sortBy('name', SORT_NATURAL | SORT_FLAG_CASE)->pluck('name', 'id');
-        $model['inventories'] = Inventory::all()->sortBy('ingredients', SORT_NATURAL | SORT_FLAG_CASE)->pluck('id', 'ingredients');
+        $model['inventories'] = Inventory::all()->sortBy('ingredients', SORT_NATURAL | SORT_FLAG_CASE)->pluck('ingredients', 'id');
         return view('inventorymenu.forminvenmenu', ['model' => $model]);
     }
 
