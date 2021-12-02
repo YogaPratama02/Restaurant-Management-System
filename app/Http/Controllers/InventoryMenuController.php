@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\inventory;
+use App\Inventory;
 use App\InventoryMenu;
 use App\Menu;
 use Carbon\Carbon;
