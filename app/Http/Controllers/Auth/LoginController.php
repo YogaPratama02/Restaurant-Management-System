@@ -70,7 +70,7 @@ class LoginController extends Controller
         } else {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
                 if (Auth::user()->hasAllRoles('super admin')) {
-                    return redirect('/category');
+                    return redirect('/report');
                 } else {
                     return redirect()->route('cashier.index');
                 }

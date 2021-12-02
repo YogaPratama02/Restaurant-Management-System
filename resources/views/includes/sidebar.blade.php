@@ -92,7 +92,7 @@
           @if(Auth::user()->hasRole('super admin|admin'))
           <a href="{{route('ppn.index')}}" class="nav-link {{(request()->is('ppn*')) ? 'active' : '' }}">
             <i class="fas fa-money-check-alt"></i>
-              <p>VAT</p>
+              <p>PPN</p>
           </a>
           @endif
         </li>

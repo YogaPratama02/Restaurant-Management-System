@@ -352,7 +352,7 @@ class CashierController extends Controller
                                 <input type="text" name="customer_name" id="customer_name" class="form-control">
                             </td>
                             <td>
-                                <label for="">Customer Phone</label>
+                                <label for="">Customer Phone (Optional)</label>
                                 <input type="number" name="customer_phone" id="customer_phone" class="form-control">
                             </td>
                         </tr>

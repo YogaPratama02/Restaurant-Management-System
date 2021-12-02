@@ -60,7 +60,7 @@
     <div class="modal-body">
         <div class="form-group">
             <label for="name" class="control-label">Nama</label>
-            <input id="name" type="text" class="form-control" name="name" value="{{$model->name}}" placeholder="Nama Kategori">
+            <input id="name" type="text" class="form-control" name="name" value="{{$model->name}}" placeholder="Nama Menu">
         </div>
         <div class="form-group">
             <label for="description" class="control-label">Description</label>
