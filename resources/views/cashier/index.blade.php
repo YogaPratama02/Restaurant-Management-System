@@ -313,7 +313,8 @@
                     },
                     url: '/cashier/savePayment',
                     success: function(data){
-                        window.location.href=data
+                        // window.location.href=data
+                        window.location.replace(data)
                     }
                 })
             });

@@ -42,7 +42,7 @@ Route::group(['middleware' => ['role:members|cashier|super admin|admin', 'verifi
 Route::group(['middleware' => ['role:cashier|super admin|admin', 'verified']], function () {
     // Cashier
     Route::post('/cashier/savePayment', 'CashierController@savePayment');
-    Route::get('/cashier/showReceipt/{saleID}', 'CashierController@showReceipt');
+    Route::get('/cashier/showReceipt/{saleID}', 'CashierController@showReceipt')->name('showReceipt');
     Route::get('/cashier/pdf/{saleID}', 'CashierController@pdf');
 
     //roombooking

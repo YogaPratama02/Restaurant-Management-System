@@ -8,7 +8,6 @@
 @endpush
 
 @section('content')
-
 <div id="wrapper">
     <div class="receipt-header">
         <h3 id="restaurant-name">{{ __("Tukad Jangga Coffee") }}</h3>

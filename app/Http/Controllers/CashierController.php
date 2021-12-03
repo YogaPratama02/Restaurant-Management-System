@@ -552,6 +552,8 @@ class CashierController extends Controller
         $saleDetails = SaleDetail::where('sale_id', $saleID)->update(['status' => 'done', 'updated_at' => $current]);
 
         return '/cashier/showReceipt/' . $saleID;
+        // return redirect('/cashier');
+        // return redirect()->route('roombooking.index');
     }
 
     public function showReceipt($saleID)
