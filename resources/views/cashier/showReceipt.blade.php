@@ -2,9 +2,12 @@
 
 @section('title','Receipt')
 
-@section('content')
+@push('after-style')
 <link type="text/css" rel="stylesheet" href="{{asset('css/receipt.css')}}" media="all">
 <link type="text/css" rel="stylesheet" href="{{asset('css/no-print.css')}}" media="print">
+@endpush
+
+@section('content')
 
 <div id="wrapper">
     <div class="receipt-header">
