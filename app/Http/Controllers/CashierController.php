@@ -15,7 +15,7 @@ use App\Ppn;
 use App\Voucher;
 use Carbon\Carbon;
 use Spatie\Permission\Models\hasRole;
-use PDF;
+use Barryvdh\DomPDF\Facade as PDF;
 
 use Illuminate\Support\Facades\Auth;
 use phpDocumentor\Reflection\Types\Null_;
@@ -310,6 +310,13 @@ class CashierController extends Controller
             $html .= '
             <div class="card-body">
             <div class="panel">
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <a href="' . route('cashier.print-customer-name', $sale_id) . '" class="btn btn-warning btn-print-customer-name" type="button">
+                            Print
+                        </a>
+                    </div>
+                </div>
                 <div class="row">
                     <td>Payment Method <br>
                     <div class="form-control sizePayment">
@@ -553,7 +560,6 @@ class CashierController extends Controller
 
         return '/cashier/showReceipt/' . $saleID;
         // return redirect('/cashier');
-        // return redirect()->route('roombooking.index');
     }
 
     public function showReceipt($saleID)
@@ -585,5 +591,20 @@ class CashierController extends Controller
         }
         $pdf = \PDF::loadView('pdf', ['sale' => $sale, 'saleDetails' => $saleDetails, 'total' => $total]);
         return $pdf->download('invoice.pdf');
+    }
+
+    public function printCustomerName($saleId)
+    {
+        $sale = Sale::findOrFail($saleId);
+        $pdf = PDF::loadView('print-customer-name', ['sale' => $sale]);
+        return $pdf->download('bill.pdf');
+    }
+
+    public function printMenu($saleId)
+    {
+        $sale = Sale::find($saleId);
+        $saleDetails = SaleDetail::where('sale_id', $saleId)->get();
+        $pdf = PDF::loadView('print-menu-name', ['sale' => $sale, 'saleDetails' => $saleDetails]);
+        return $pdf->download('order.pdf');
     }
 }

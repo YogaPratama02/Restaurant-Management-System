@@ -44,6 +44,8 @@ Route::group(['middleware' => ['role:cashier|super admin|admin', 'verified']], f
     Route::post('/cashier/savePayment', 'CashierController@savePayment');
     Route::get('/cashier/showReceipt/{saleID}', 'CashierController@showReceipt')->name('showReceipt');
     Route::get('/cashier/pdf/{saleID}', 'CashierController@pdf');
+    Route::get('/cashier/print-customer-name/{saleID}', 'CashierController@printCustomerName')->name('cashier.print-customer-name');
+    Route::get('/cashier/order-menu-name/{saleID}', 'CashierController@printMenu')->name('cashier.print-menu-name');
 
     //roombooking
     Route::get('/bookingroom', 'RoomBookingController@index')->name('roombooking.index');

@@ -21,9 +21,15 @@
                             <li class="list-group-item">{{$saleDetail->note}}</li>
                             @if ($saleDetail->status == 'confirm')
                                 <div class="btn" style="background-color: #f3b949" id="confirm" data-id='{!! $saleDetail->id !!}'>Confirm</div>
+                                <a href="{{route('cashier.print-menu-name', $saleDetail->sale_id)}}" class="btn btn-primary mt-1" type="button">
+                                    Print
+                                </a>
                             @endif
                             @if ($saleDetail->status == 'waiting')
                                 <div class="btn" style="background-color: #ff7171" id="waiting" data-id='{!! $saleDetail->id !!}'>Done!!</div>
+                                <a href="{{route('cashier.print-menu-name', $saleDetail->sale_id)}}" class="btn btn-primary mt-1" type="button">
+                                    Print
+                                </a>
                             @endif
                         </ul>
                     </div>
@@ -40,9 +46,15 @@
                     <li class="list-group-item">{{$saleDetail->note}}</li>
                     @if ($saleDetail->status == 'confirm')
                         <div class="btn" style="background-color: #f3b949" id="confirm" data-id='{!! $saleDetail->id !!}'>Confirm</div>
+                        <a href="{{route('cashier.print-menu-name', $saleDetail->sale_id)}}" class="btn btn-primary mt-1" type="button">
+                            Print
+                        </a>
                     @endif
                     @if ($saleDetail->status == 'waiting')
                         <div class="btn" style="background-color: #ff7171" id="waiting" data-id='{!! $saleDetail->id !!}'>Done!!</div>
+                        <a href="{{route('cashier.print-menu-name', $saleDetail->sale_id)}}" class="btn btn-primary mt-1" type="button">
+                            Print
+                        </a>
                     @endif
                 </ul>
             </div>

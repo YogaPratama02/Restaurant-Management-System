@@ -299,7 +299,6 @@
 
             $('#order').on('click', '.btn-payment', function(data){
                 sale_id = $(this).data('id');
-                let url = 'https://tukadjangga.com/cashier/showReceipt/' + sale_id
                 let paid_amount = $('#paid_amount').val();
                 let payment_type = $(".true:checked").val();
                 let saleId = sale_id;
@@ -314,8 +313,7 @@
                     },
                     url: '/cashier/savePayment',
                     success: function(data){
-                        // window.location.href=data
-                        window.location.replace(url)
+                        window.location.href=data
                     }
                 })
             });
