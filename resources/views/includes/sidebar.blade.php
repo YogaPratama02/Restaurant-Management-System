@@ -105,7 +105,7 @@
           @endif
         </li>
         <li class="nav-item">
-            @if(Auth::user()->hasRole('super admin'))
+            @if(Auth::user()->hasRole('super admin|finance'))
           <a href="#" class="nav-link">
             <i class="nav-icon fas fa-chart-line" style="margin-left: -0.2rem"></i>
             <p style="margin-left: -0.4rem">
@@ -115,7 +115,7 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              @if(Auth::user()->hasRole('super admin'))
+              @if(Auth::user()->hasRole('super admin|finance'))
               <a href="{{route('report.index')}}" class="nav-link {{(request()->is('report*')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Sale Report By Date</p>
@@ -123,7 +123,7 @@
               @endif
             </li>
             <li class="nav-item">
-              @if(Auth::user()->hasRole('super admin'))
+              @if(Auth::user()->hasRole('super admin|finance'))
               <a href="{{route('report.indexmonth')}}" class="nav-link {{(request()->is('month*')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Sale Report By Month</p>
@@ -131,7 +131,7 @@
               @endif
             </li>
             <li class="nav-item">
-              @if(Auth::user()->hasRole('super admin'))
+              @if(Auth::user()->hasRole('super admin|finance'))
               <a href="{{route('report.employee')}}" class="nav-link {{(request()->is('employee*')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Employee Report</p>
@@ -139,7 +139,7 @@
               @endif
             </li>
             <li class="nav-item">
-                @if(Auth::user()->hasRole('super admin'))
+                @if(Auth::user()->hasRole('super admin|finance'))
               <a href="{{route('purchase.index')}}" class="nav-link {{(request()->is('purchase*')) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Purchase Report</p>
@@ -147,7 +147,7 @@
                 @endif
             </li>
             <li class="nav-item">
-                @if(Auth::user()->hasRole('super admin'))
+                @if(Auth::user()->hasRole('super admin|finance'))
               <a href="{{route('customer.index')}}" class="nav-link {{(request()->is('customer*')) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Data Customers</p>
@@ -155,7 +155,7 @@
                 @endif
             </li>
             <li class="nav-item">
-                @if(Auth::user()->hasRole('super admin'))
+                @if(Auth::user()->hasRole('super admin|finance'))
               <a href="{{route('member.index')}}" class="nav-link {{(request()->is('member*')) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Members Customers</p>

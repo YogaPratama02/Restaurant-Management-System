@@ -160,7 +160,7 @@ Route::group(['middleware' => ['role:super admin|admin', 'verified']], function 
     Route::delete('/voucher/delete/{id}', 'VoucherController@destroy')->name('voucher.destroy');
 });
 
-Route::group(['middleware' => ['role:super admin', 'verified']], function () {
+Route::group(['middleware' => ['role:super admin|finance', 'verified']], function () {
     // report
     Route::get('/report', 'ReportController@index')->name('report.index');
     Route::get('/report/show', 'ReportController@show')->name('report.showReport');

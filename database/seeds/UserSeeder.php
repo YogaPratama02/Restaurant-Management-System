@@ -51,6 +51,15 @@ class UserSeeder extends Seeder
             'password' => bcrypt('members12345'),
         ]);
         $members->assignRole('members');
+
+        $finance = User::create([
+            'name' => 'finance',
+            'email' => 'finance@gmail.com',
+            'email_verified_at' => date('Y-m-d H:i:s'),
+            'phone_number' => '0870178921',
+            'password' => bcrypt('finance12345'),
+        ]);
+        $finance->assignRole('finance');
         // DB::table('categories')->insert([
         //     [
         //         'name' => 'Breakfast'

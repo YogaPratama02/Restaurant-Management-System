@@ -596,7 +596,16 @@ class CashierController extends Controller
     public function printCustomerName($saleId)
     {
         $sale = Sale::findOrFail($saleId);
-        $pdf = PDF::loadView('print-customer-name', ['sale' => $sale]);
+        $saleDetails = SaleDetail::where('sale_id', $saleId)->get();
+        $ppn = Ppn::select([
+            DB::raw("SUM(ppn) as ppn")
+        ])->groupBy('ppn')->orderBy('ppn')->first();
+        if ($ppn == NULL) {
+            $total = 0;
+        } else {
+            $total = $ppn->sum('ppn');
+        }
+        $pdf = PDF::loadView('print-customer-name', ['sale' => $sale, 'saleDetails' => $saleDetails, 'total' => $total]);
         return $pdf->download('bill.pdf');
     }
 

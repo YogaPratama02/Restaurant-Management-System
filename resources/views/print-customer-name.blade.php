@@ -60,23 +60,59 @@
               <div class="date">
                   <p>Date: {{ \Carbon\Carbon::now()->timezone('GMT+7')->format('d-m-Y H:i') }}</p>
               </div>
+              <div id="receipt-header">
+                  <h4>Name : {{$sale->customer_name}}</h4>
+                  <h4>Phone : {{$sale->customer_phone}}</h4>
+                  <h4>Table : {{$sale->table->name}}</h4>
+              </div>
               <div id="receipt-body">
                 <table class="tb-sale-detail">
                     <thead>
+                      <tr>
+                        <th>Menu</th>
+                        <th>Qty</th>
+                        <th>Price</th>
+                        <th>Diskon</th>
+                        <th>Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($saleDetails as $saleDetail)
                         <tr>
-                          <th>Name</th>
-                          <th>Phone</th>
-                          <th>Table</th>
+                          <td width="30">{{$saleDetail->menu_name}}</td>
+                          <td width="30">{{$saleDetail->quantity}}</td>
+                          <td width="30">{{number_format($saleDetail->menu_price * $saleDetail->quantity, 0, ',', '.' )}}</td>
+                          <td width="30">{{$saleDetail->menu_discount}} %</td>
+                          <td width="30">{{number_format(($saleDetail->menu_price * $saleDetail->quantity) - ($saleDetail->menu_price * $saleDetail->quantity * ($saleDetail->menu_discount / 100)), 0, ',', '.' )}}</td>
                         </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                            <td width="30">{{$sale->customer_name}}</td>
-                            <td width="30">{{$sale->customer_phone}}</td>
-                            <td width="30">{{$sale->table->name}}</td>
-                          </tr>
-                      </tbody>
-                </table>
+                        @endforeach
+                    </tbody>
+                  </table>
+                  <table class="tb-sale-total">
+                    <tbody>
+                      <tr>
+                        <td colspan="3">VAT</td>
+                        <td colspan="4" class="change">{{$total}} %</td>
+                      </tr>
+                      @if ($sale->voucher_id != NULL)
+                      <tr>
+                        <td colspan="3">Discount</td>
+                        <td colspan="4" class="change">{{$sale->voucher->discount}} %</td>
+                      </tr>
+                      @endif
+                      @if ($sale->voucher_id != NULL)
+                      <tr>
+                        <td colspan="3">Total</td>
+                        <td colspan="4" class="change">Rp{{number_format($sale->total_price + ($sale->total_price * $total/ 100) - ($sale->total_price * $sale->voucher->discount / 100), 0, ',', '.' )}}</td>
+                      </tr>
+                      @else
+                      <tr>
+                        <td colspan="3">Total</td>
+                        <td colspan="4" class="change">Rp{{number_format($sale->total_price + ($sale->total_price * $total/ 100), 0, ',', '.' )}}</td>
+                      </tr>
+                      @endif
+                    </tbody>
+                  </table>
               </div>
               <div id="receipt-footer">
                 <h5 class="thanks">Thank You!!!</h5>

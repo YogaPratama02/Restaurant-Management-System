@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -70,6 +70,8 @@ class LoginController extends Controller
         } else {
             if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $request->remember)) {
                 if (Auth::user()->hasAllRoles('super admin')) {
+                    return redirect('/report');
+                } elseif (Auth::user()->hasAllRoles('finance')) {
                     return redirect('/report');
                 } else {
                     return redirect()->route('cashier.index');
