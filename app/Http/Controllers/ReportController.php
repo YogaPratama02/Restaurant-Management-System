@@ -128,7 +128,7 @@ class ReportController extends Controller
         $sale = DB::table('sales')->select([
             DB::raw(
                 "DATE_FORMAT(created_at, '%Y') as month,
-            (CASE WHEN payment_type = 'cash' THEN SUM(total_vatprice) WHEN payment_type = 'bank_transfer' THEN SUM(total_vatprice) WHEN payment_type = 'payment_card' THEN SUM(total_vatprice) END) as total_cash",
+            (CASE WHEN payment_type = 'cash' THEN SUM(total_vatprice) WHEN payment_type = 'bank_transfer' THEN SUM(total_vatprice) WHEN payment_type = 'payment_card' THEN SUM(total_vatprice) END) as total_cash"
             ),
             DB::raw('max(created_at) as createdAt')
         ])->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('month')->groupBy('payment_type')->orderBy('createdAt')->get();
