@@ -7,7 +7,7 @@
 <div class="login-container d-flex align-items-center justify-content-center">
     <form method="POST" action="{{ route('login') }}" class="login-form text-center">
         @csrf
-        <img width="170rem" class="mb-5 font-weight-light" src="{{asset('images/restaurant.svg')}}"/>
+        <img width="180rem" height="180rem" class="mb-2 font-weight-light" src="{{asset('images/logo.jpeg')}}"/>
 
         <div class="form-group">
             <input id="email" type="email" class="form-control rounded-pill form-control-lg @error('email') is-invalid @enderror" name="email" placeholder="Email.." required autocomplete="email" autofocus>
