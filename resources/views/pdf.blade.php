@@ -53,8 +53,8 @@
         </style>
         <div id="wrapper">
             <div id="receipt-header">
-              <h2 id="restaurant-name">Rajapala Coffee</h2>
-              <p class="me">JL. KH Ahmad Dalan No. 18, Kebayboran Baru, Kramat Peta, Kota Jakarta Selatan, DKI Jakarta,121 30</p>
+              <h2 id="restaurant-name">Tukad Jangga Coffee</h2>
+              <p class="me">Jl Untung Surapati, Belakang komplek Perumahan Pandawa</p>
               <p class="we">Tel: 473-XXXX-XXXX</p>
             </div>
             <div class="date">
