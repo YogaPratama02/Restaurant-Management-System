@@ -10,7 +10,7 @@
 @section('content')
 <div id="wrapper">
     <div class="receipt-header">
-        <h3 id="restaurant-name">{{ __("Tukad Jangga Coffee") }}</h3>
+        <h3 id="restaurant-name">{{ __("Tukad Jangga Restaurant") }}</h3>
     </div>
     <div class="receipt text-center" style="text-align: center;">
         <p>Jl Untung Surapati, Belakang komplek Perumahan Pandawa</p>
