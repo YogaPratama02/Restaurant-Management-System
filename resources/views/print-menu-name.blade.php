@@ -57,7 +57,7 @@
         </style>
         <div id="wrapper">
             <div id="receipt-header">
-                <h2 id="restaurant-name">Tukad Jangga Coffee</h2>
+                <h2 id="restaurant-name">Tukad Jangga Restaurant</h2>
                 <p class="me">Jl Untung Surapati, Belakang komplek Perumahan Pandawa</p>
                 <p class="we">Tel: 473-XXXX-XXXX</p>
             </div>
