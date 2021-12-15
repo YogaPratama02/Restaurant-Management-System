@@ -159,13 +159,19 @@ Route::group(['middleware' => ['role:super admin|admin', 'verified']], function 
     Route::put('/voucher/update/{id}', 'VoucherController@update')->name('voucher.update');
     Route::delete('/voucher/delete/{id}', 'VoucherController@destroy')->name('voucher.destroy');
 });
-
+Route::group(['middleware' => ['role:super admin', 'verified']], function () {
+    // Transaction
+    Route::get('/transaction', 'TransactionController@index')->name('transaction.index');
+    Route::delete('/transaction/delete/{id}', 'TransactionController@delete')->name('transaction.delete');
+    Route::get('/transaction/data', 'TransactionController@data')->name('transaction.data');
+});
 Route::group(['middleware' => ['role:super admin|finance', 'verified']], function () {
     // report
     Route::get('/report', 'ReportController@index')->name('report.index');
     Route::get('/report/show', 'ReportController@show')->name('report.showReport');
     Route::get('/report/dataTable', 'ReportController@dataTable')->name('report.dataTable');
     Route::get('/report/dataDaily', 'ReportController@dataDaily')->name('report.dataDaily');
+    Route::delete('/report/delete/dataDaily/{id}', 'ReportController@deleteDataDaily')->name('report.delete.dataDaily');
     Route::get('/report/typeDaily', 'ReportController@typeDaily')->name('report.typeDaily');
     Route::get('/report/resume', 'ReportController@resumeDaily')->name('report.resumeDaily');
     Route::get('/report/month', 'ReportController@month')->name('report.indexmonth');

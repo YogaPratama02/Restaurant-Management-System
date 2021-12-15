@@ -612,7 +612,9 @@ class CashierController extends Controller
     public function printMenu($saleId)
     {
         $sale = Sale::find($saleId);
-        $saleDetails = SaleDetail::where('sale_id', $saleId)->get();
+        $saleDetails = SaleDetail::where('sale_id', $saleId)
+            ->where('status', 'confirm')
+            ->get();
         $pdf = PDF::loadView('print-menu-name', ['sale' => $sale, 'saleDetails' => $saleDetails]);
         return $pdf->download('order.pdf');
     }

@@ -18,8 +18,8 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-            $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+            $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+            $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
             // $hmtl = array();
             $html['cash'] = '';
             $html['transfer'] = '';
@@ -61,8 +61,8 @@ class ReportController extends Controller
 
     public function dataDailyCustomers(Request $request)
     {
-        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
         // $user = Sale::whereBetween('created_at', [$date_start, $date_end])->orderBy('created_at', 'asc')->get();
         $user = Sale::whereBetween(DB::raw('DATE(created_at)'), array($date_start, $date_end))->orderBy('created_at', 'asc')->get();
         return DataTables()->of($user)
@@ -84,10 +84,16 @@ class ReportController extends Controller
             ->make(true);
     }
 
+    public function deleteDataDaily($id)
+    {
+        Sale::findOrFail($id)->delete();
+        return response()->json();
+    }
+
     public function dataDaily(Request $request)
     {
-        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
         $sale = DB::table('sales')->select(
             DB::raw("DATE_FORMAT(created_at, '%d-%m-%Y') as date,
             SUM(total_hpp) as total_hpp,
@@ -117,14 +123,14 @@ class ReportController extends Controller
             })
             ->addIndexColumn()
             ->removeColumn([])
-            ->rawColumns(['date', 'total_hpp', 'total_price', 'total_vatprice'])
+            ->rawColumns(['date', 'total_hpp', 'total_price', 'total_vatprice', 'action'])
             ->make(true);
     }
 
     public function typeDaily(Request $request)
     {
-        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
         $sale = DB::table('sales')->select([
             DB::raw(
                 "DATE_FORMAT(created_at, '%Y') as month,
@@ -146,8 +152,8 @@ class ReportController extends Controller
 
     public function resumeDaily(Request $request)
     {
-        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
         $sale_detail = DB::table('sale_details')->selectRaw('menu_name, SUM(quantity) as count')->groupBy('menu_name')->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_name')->get();
         return DataTables()->of($sale_detail)
             ->addColumn('menu_name', function ($sale_detail) {
@@ -172,8 +178,10 @@ class ReportController extends Controller
     public function month(Request $request)
     {
         if ($request->ajax()) {
-            $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-            $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+            $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+            $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
+            // $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
+            // $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
             $html['cash'] = '';
             $html['bank'] = '';
             $html['card'] = '';
@@ -231,8 +239,10 @@ class ReportController extends Controller
 
     public function dataMonth(Request $request)
     {
-        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        // $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
+        // $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
         $sale = DB::table('sales')->select([
             DB::raw(
                 "DATE_FORMAT(created_at, '%Y-%m') as month,
@@ -270,8 +280,8 @@ class ReportController extends Controller
 
     public function menuMonth(Request $request)
     {
-        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
         $sale_detail = DB::table('sale_details')->selectRaw('menu_name, SUM(quantity) as count')->groupBy('menu_name')->whereBetween(DB::raw('DATE(created_at)'), [$date_start, $date_end])->groupBy('menu_name')->get();
         return DataTables()->of($sale_detail)
             ->addColumn('menu_name', function ($sale_detail) {
@@ -299,8 +309,8 @@ class ReportController extends Controller
     }
     public function employee(Request $request)
     {
-        $date_start = date("Y-m-d H:i:s", strtotime($request->date_start));
-        $date_end = date("Y-m-d H:i:s", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
 
 
         // $sales = Sale::select(DB::raw('count(user_id) as count, user_id'))->groupBy('user_id')->whereBetween('updated_at', [$date_start, $date_end])->where('sale_status', 'paid')->where(function ($sale) {
@@ -313,7 +323,12 @@ class ReportController extends Controller
             'users.id as id',
             'users.name as name',
             DB::raw("count(users.name) as count")
-        )->groupBy('id')->whereBetween(DB::raw('DATE(sales.created_at)'), [$date_start, $date_end])->where('sales.sale_status', 'paid')->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')->join('roles', 'model_has_roles.role_id', '=', 'roles.id')->where('roles.name', '=', 'cashier')->get();
+        )->groupBy('users.id')->whereBetween(DB::raw('DATE(sales.created_at)'), [$date_start, $date_end])
+            ->where('sales.sale_status', 'paid')
+            ->join('model_has_roles', 'users.id', '=', 'model_has_roles.model_id')
+            ->join('roles', 'model_has_roles.role_id', '=', 'roles.id')
+            ->where('roles.name', '=', 'cashier')
+            ->get();
         // $sales = Auth::user()->Role('cashiers')->whereBetween(DB::raw('DATE(sales.created_at)'), [$date_start, $date_end]);
         return DataTables()->of($sales)
             ->addColumn('employee_name', function ($sales) {
@@ -335,8 +350,8 @@ class ReportController extends Controller
 
     public function purchase(Request $request)
     {
-        $date_start = date("Y-m-d", strtotime($request->date_start));
-        $date_end = date("Y-m-d", strtotime($request->date_end));
+        $date_start = date("Y-m-d 0:0:0", strtotime($request->date_start));
+        $date_end = date("Y-m-d 23:59:59", strtotime($request->date_end));
         $purchase = Supplier::select([
             DB::raw("DATE_FORMAT(created_at, '%Y-%m') as month"),
             DB::raw("SUM(total) as total"),
@@ -384,21 +399,6 @@ class ReportController extends Controller
     //     // }, $data);
 
     //     return view('report.indexmonth', ['month' => json_encode($bulan), 'data' => json_encode($data)]);
-    // }
-
-    // public function purchaseTotal(Request $request)
-    // {
-    //     if ($request->ajax()) {
-    //         $date_start = date("Y-m-d H:i:s", strtotime($request->date_start . ' 00:00:00'));
-    //         $date_end = date("Y-m-d H:i:s", strtotime($request->date_end . ' 23:59:59'));
-    //         $purchase = Supplier::whereBetween('updated_at', [$date_start, $date_end])->get();
-    //         $html['total'] = 0;
-    //         foreach ($purchase as $purchase) {
-    //             $html['total'] += $purchase->total;
-    //         }
-    //         $html['total'] = number_format($html['total'], 0, ',', '.');
-    //     }
-    //     return json_encode($html);
     // }
 
     public function customers(Request $request)

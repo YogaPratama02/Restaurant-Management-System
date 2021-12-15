@@ -115,6 +115,14 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
+                @if(Auth::user()->hasRole('super admin'))
+                <a href="{{route('transaction.index')}}" class="nav-link {{(request()->is('transaction*')) ? 'active' : '' }}">
+                    <i class="far fa-circle nav-icon"></i>
+                    <p>All Transaction</p>
+                </a>
+                @endif
+            </li>
+            <li class="nav-item">
               @if(Auth::user()->hasRole('super admin|finance'))
               <a href="{{route('report.index')}}" class="nav-link {{(request()->is('report*')) ? 'active' : '' }}">
                   <i class="far fa-circle nav-icon"></i>

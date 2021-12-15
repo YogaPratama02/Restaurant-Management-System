@@ -31,15 +31,16 @@
                             <div class="tab-content">
                             <div class="table-reponsive">
                                 <table id="sale_daily" class="table hover display" style="width:100%">
-                                    <thead>
+                                    {{-- <thead>
                                         <tr>
                                             <th>No</th>
                                             <th>Date Time</th>
                                             <th>Total HPP</th>
                                             <th>Total Price</th>
                                             <th>Total Sale</th>
+                                            <th>Action</th>
                                         </tr>
-                                    </thead>
+                                    </thead> --}}
                                     <tfoot>
                                         <tr>
                                             <th colspan="4" style="text-align:right">Total:</th>
@@ -132,11 +133,12 @@ $(document).ready(function(){
             data: {date_start: date_start, date_end:date_end}
         },
         columns: [
-        {data: 'DT_RowIndex', name: 'DT_RowIndex', orderable:false, className: 'dt-center'},
-        {data: 'date', name: 'date', className: 'dt-center'},
-        {data: 'total_hpp', name: 'total_hpp', className: 'dt-center'},
-        {data: 'total_price', name: 'total_price', className: 'dt-center'},
-        {data: 'total_vatprice', name: 'total_vatprice', className: 'dt-center'},
+        {title: 'No', data: 'DT_RowIndex', name: 'DT_RowIndex', orderable:false, className: 'dt-center'},
+        {title: 'Date', data: 'date', name: 'date', className: 'dt-center'},
+        {title: 'Total HPP', data: 'total_hpp', name: 'total_hpp', className: 'dt-center'},
+        // {title: 'Net Sales', data: 'total_price', name: 'total_price', className: 'dt-center'},
+        {title: 'Total Price', data: 'total_price', name: 'total_price', className: 'dt-center'},
+        {title: 'Total Price (VAT)', data: 'total_vatprice', name: 'total_vatprice', className: 'dt-center'}
         ],
         "footerCallback": function ( row, data, date_start, date_end, display ) {
             var api = this.api(), data;
@@ -262,6 +264,53 @@ $(document).ready(function(){
         menu_data();
         customer_data();
     });
+
+    $('body').on('click', '.btn-delete', function(event) {
+            event.preventDefault();
+            var me = $(this),
+                url = me.attr('href'),
+                title = me.attr('title'),
+                csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+            swal.fire({
+            title: 'Are you sure want to delete ' + title + ' ?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.value) {
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: {
+                            '_method': "DELETE",
+                            '_token' :'{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $('#datatable').DataTable().ajax.reload();
+
+                            swal.fire({
+                                icon: 'success',
+                                title: 'Your file has been deleted!',
+                                position: 'center',
+                                showConfirmButton: false,
+                                timer: 2000
+                            });
+                        },
+                        error: function(xhr) {
+                            swal.fire({
+                                icon: 'error',
+                                title: 'Opppss..',
+                                text: 'Something Wrong :('
+                            });
+                        }
+                    });
+                }
+            });
+        });
 });
 </script>
 @endpush

@@ -56,11 +56,11 @@
             }
         </style>
         <div id="wrapper">
-            <div id="receipt-header">
+            {{-- <div id="receipt-header">
                 <h2 id="restaurant-name">Tukad Jangga Restaurant</h2>
                 <p class="me">Jl Untung Surapati, Belakang komplek Perumahan Pandawa</p>
                 <p class="we">Tel: 473-XXXX-XXXX</p>
-            </div>
+            </div> --}}
             <div id="receipt-header">
                 <h2 id="restaurant-name">Table : {{$sale->table->name}}</h2>
             </div>
