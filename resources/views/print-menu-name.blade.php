@@ -43,16 +43,16 @@
                 padding-right: 1.5%;
             }
             .me, .we {
-                font-size: 14px;
+                font-size: 16px;
                 text-align: center;
             }
             .thanks {
-                font-size: 14px;
+                font-size: 16px;
                 text-align: center;
             }
 
             .tb-sale-detail {
-                font-size: 16px;
+                font-size: 18px;
             }
         </style>
         <div id="wrapper">
