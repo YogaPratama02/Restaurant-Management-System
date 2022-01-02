@@ -10,7 +10,7 @@
                     <div class="card-header" style="background-color:#97cf6e">
                         <h5 class="card-title mt-1 text-white"><i class="fas fa-truck-moving"></i> PPN
                         </h5>
-                        {{-- <a href="{{ route('ppn.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#F3B949" title="Create PPN"><i class="fas fa-plus"></i> Create PPN</a> --}}
+                        <a href="{{ route('ppn.create') }}" class="btn btn-sm float-right modal-show text-white" style="background-color:#F3B949" title="Create PPN"><i class="fas fa-plus"></i> Create PPN</a>
                     </div>
                     <div class="card-body">
                         <table id="datatable" class="table table-bordered" style="width:100%">
