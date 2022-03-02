@@ -11,18 +11,21 @@
     <tbody>
         @foreach ($cards as $cards)
             <tr>
-                <td>{{$loop->iteration}}</td>
-                <td>{{ date("M Y", strtotime($cards->month))}}</td>
-                <td>Rp. {{number_format($cards->total_hpp, 2, ',', '.')}}</td>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ date('M Y', strtotime($cards->month)) }}</td>
+                <td>{{ $cards->total_hpp }}</td>
+                <td>{{ $cards->total_price }}</td>
+                <td>{{ $cards->total_vatprice }}</td>
+                {{-- <td>Rp. {{number_format($cards->total_hpp, 2, ',', '.')}}</td>
                 <td>Rp. {{number_format($cards->total_price, 2, ',', '.')}}</td>
-                <td>Rp. {{number_format($cards->total_vatprice, 2, ',', '.')}}</td>
+                <td>Rp. {{number_format($cards->total_vatprice, 2, ',', '.')}}</td> --}}
             </tr>
         @endforeach
     </tbody>
     <tfoot>
         <tr>
             <th colspan="4">Total</th>
-            <td>{{number_format($total, 2, ',', '.')}}</td>
+            <td>{{ $total }}</td>
         </tr>
     </tfoot>
 </table>
@@ -34,9 +37,9 @@
     </tr>
     <tbody>
         <tr>
-            <td>Rp. {{number_format($total_cash, 2, ',', '.')}}</td>
-            <td>Rp. {{number_format($total_bank, 2, ',', '.')}}</td>
-            <td>Rp. {{number_format($total_card, 2, ',', '.')}}</td>
+            <td>{{ $total_cash }}</td>
+            <td>{{ $total_bank }}</td>
+            <td>{{ $total_card }}</td>
         </tr>
     </tbody>
 </table>
@@ -51,9 +54,9 @@
     <tbody>
         @foreach ($saleDetail as $saleDetail)
             <tr>
-                <td>{{$loop->iteration}}</td>
-                <td>{{$saleDetail->menu_name}}</td>
-                <td>{{$saleDetail->count}}</td>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $saleDetail->menu_name }}</td>
+                <td>{{ $saleDetail->count }}</td>
             </tr>
         @endforeach
     </tbody>
