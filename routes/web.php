@@ -191,6 +191,7 @@ Route::group(['middleware' => ['role:super admin|finance', 'verified']], functio
     // export excel
     Route::get('/report/show/export', 'ReportController@reportExcel')->name('report.excel');
     Route::get('/report/day/export', 'ReportController@dayExcel')->name('report.dayexcel');
+    Route::get('/report/purchase/export', 'ReportController@reportExcelPurchase')->name('report.purchaseexcel');
 
     // customer report
     Route::get('/customer', 'ReportController@customers')->name('customer.index');
