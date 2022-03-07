@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Exports\SupplierExport;
 use App\Supplier;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SupplierController extends Controller
 {
@@ -25,7 +27,7 @@ class SupplierController extends Controller
         $request->validate([
             'date' => 'required|date',
             'name' => 'required|max:255',
-            'total' => 'required|numeric'
+            'total' => 'required|numeric',
         ]);
         $user = auth()->user();
         $suppliers = new Supplier();
@@ -51,7 +53,7 @@ class SupplierController extends Controller
         $request->validate([
             'date' => 'required|date',
             'name' => 'required|max:255',
-            'total' => 'required|numeric'
+            'total' => 'required|numeric',
         ]);
 
         $suppliers = Supplier::find($id);
@@ -70,15 +72,20 @@ class SupplierController extends Controller
         $suppliers->delete();
     }
 
+    public function export()
+    {
+        return Excel::download(new SupplierExport(), 'SupplierReport.xlsx');
+    }
+
     public function dataTable()
     {
-        $suppliers = Supplier::get();
+        $suppliers = Supplier::orderBy('date', 'DESC');
         return DataTables()->of($suppliers)
             ->addColumn('action', function ($suppliers) {
                 return view('supplier.supplieraction', [
                     'suppliers' => $suppliers,
                     'url_edit' => route('supplier.edit', $suppliers->id),
-                    'url_destroy' => route('supplier.destroy', $suppliers->id)
+                    'url_destroy' => route('supplier.destroy', $suppliers->id),
                 ]);
             })
             ->editColumn('date', function ($suppliers) {

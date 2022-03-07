@@ -1,8 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\SaleDetail;
-use Facade\FlareClient\Http\Response;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +12,7 @@ use Facade\FlareClient\Http\Response;
 | routes are loaded by the RouteServiceProvider within a group which
 | contains the "web" middleware group. Now create something great!
 |
-*/
+ */
 
 Route::get('/', 'HomeController@show');
 
@@ -124,6 +123,7 @@ Route::group(['middleware' => ['role:super admin|admin', 'verified']], function 
 
     //purchase
     Route::get('/supplier', 'SupplierController@index')->name('supplier.index');
+    Route::get('/supplier/report', 'SupplierController@export')->name('supplier.export');
     Route::get('/supplier/data', 'SupplierController@dataTable')->name('supplier.data');
     Route::get('/supplier/create', 'SupplierController@create')->name('supplier.create');
     Route::post('/supplier/store', 'SupplierController@store')->name('supplier.store');
