@@ -46,7 +46,7 @@ class SignUpVerify extends VerifyEmailBase
             return call_user_func(static::$toMailCallback, $notifiable, $verificationUrl);
         }
         return (new MailMessage)
-            ->from('rajapalacafe@gmail.com', 'Rajapala Caffe')
+            ->from('rajapalacafe@gmail.com', 'Tukad Jangga Caffe')
             ->subject('E-mail Verification')
             ->line('Silakan klik tombol di bawah ini untuk memverifikasi alamat email kamu.')
             ->action('Klik Disini', $verificationUrl)
